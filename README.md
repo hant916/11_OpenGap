@@ -98,3 +98,15 @@ The artifact is shippable only when all are true:
 - No LLM dependency for the core gap decision.
 
 See `docs/10-48h-delivery-plan.md` before implementation.
+
+## Production demo
+
+- **Live app:** https://11-open-gap.vercel.app/
+- **Golden topic:** `Quantum Computing`
+- **Production smoke:** 19 Aug 2026 — the live analysis returned a growing
+  `translation_gap` from 66,546 publications, 816 projects, 544 software
+  records, and 1,549 datasets. The rendered result includes the finding,
+  reasons, measured signals, refinements, and six representative evidence
+  records without unfinished UI.
+- **Evidence check:** the six visible Quantum Computing evidence links were
+  verified as reachable (HTTP 200). The API response contains no OpenAIRE token.
