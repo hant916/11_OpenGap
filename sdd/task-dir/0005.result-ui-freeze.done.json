@@ -1,0 +1,231 @@
+{
+  "schema_version": "impl-pack.v3.convergence",
+  "identity": {
+    "project": "opengap",
+    "batch": "hackathon-freeze",
+    "id": "0005.result-ui-freeze",
+    "sequence": 5,
+    "slug": "result-ui-freeze",
+    "title": "Freeze result information hierarchy",
+    "type": "reporting",
+    "pack_kind": "implementation"
+  },
+  "scheduling": {
+    "status_source_of_truth": "filename_suffix",
+    "allowed_suffixes": [
+      "todo",
+      "done"
+    ],
+    "on_success": "rename_todo_to_done",
+    "on_failure": "keep_todo"
+  },
+  "human_pressure": {
+    "one_screen_brief": "Reorder and polish the existing result page so a judge understands the finding, caveat, measured signals, reason, next action, and evidence within seconds. Keep the homepage minimal and add at most one OpenAIRE positioning sentence. Depends on: 0001.result-semantics-freeze, 0003.evidence-chain, 0004.golden-demo-contracts.",
+    "why_now": "The underlying product is already understandable; the remaining UI work should amplify evidence rather than introduce a new visual system.",
+    "do_not_misread": [
+      "This is a hackathon freeze pack: improve credibility and demo reliability without widening the product surface.",
+      "Repository-specific file paths and validation commands must be mapped from the actual OpenGap repository before execution.",
+      "A measured imbalance is a signal, not proof of a scientific research gap."
+    ],
+    "red_lines": [
+      "Do not add a new design-system dependency.",
+      "Do not add graph animations, dashboards, feature-card sections, or decorative architecture.",
+      "Do not hide the caveat below the evidence section.",
+      "Do not turn zero into an error state merely for visual emphasis."
+    ]
+  },
+  "machine_core": {
+    "goal": "Implement a minimal result-page hierarchy centered on the potential finding, uncertainty caveat, four measured entity signals, trend basis, why-flagged explanation, next scans, and evidence.",
+    "red_lines": [
+      "Do not add a new design-system dependency.",
+      "Do not add graph animations, dashboards, feature-card sections, or decorative architecture.",
+      "Do not hide the caveat below the evidence section.",
+      "Do not turn zero into an error state merely for visual emphasis."
+    ],
+    "invariants": [
+      "The topic and finding are the primary visual hierarchy.",
+      "Caveat is visible near the hero finding.",
+      "Publications, projects, software, and datasets are readable at a glance.",
+      "Large counts use locale separators.",
+      "Trend has a visible basis or renders as insufficient data.",
+      "Dependency 0001.result-semantics-freeze must already be accepted before this pack is accepted.",
+      "Dependency 0003.evidence-chain must already be accepted before this pack is accepted.",
+      "Dependency 0004.golden-demo-contracts must already be accepted before this pack is accepted."
+    ],
+    "contracts": [
+      "Preferred result order is topic -> finding -> interpretation -> caveat -> measured signals -> why flagged -> suggested next scans -> evidence.",
+      "Homepage may add at most one supporting sentence explaining OpenAIRE cross-entity gaps.",
+      "Loading may show bounded narrative stages but no fake progress percentage."
+    ],
+    "failure_semantics": [
+      "If a signal is unavailable, render unavailable rather than zero.",
+      "If trend basis is unavailable, render insufficient data.",
+      "If evidence is empty, keep the measured result and explain that representative records are unavailable rather than hiding the whole finding."
+    ],
+    "complexity_budget": {
+      "max_new_files": 2,
+      "max_new_abstractions": 1,
+      "prefer_modify_over_create": true,
+      "prefer_adapt_over_rewrite": true,
+      "forbidden_complexity": [
+        "new database infrastructure",
+        "new authentication or personalization subsystem",
+        "vector database or embeddings pipeline",
+        "multi-agent orchestration",
+        "new design system",
+        "broad backend rewrite"
+      ]
+    },
+    "files": {
+      "allow": [],
+      "create": [],
+      "forbid": [
+        ".everrun/**",
+        "*.log",
+        "runtime artifacts",
+        "runtime history",
+        "generated execution reports",
+        "large generated artifacts",
+        "lockfiles unless explicitly required",
+        "secrets or credential files"
+      ]
+    },
+    "steps": [
+      {
+        "id": "T1",
+        "title": "Map current result and homepage components",
+        "details": [
+          "Identify existing layout, signal list/cards, finding area, evidence area, example topics, and loading/error components.",
+          "Prefer edits over new components unless the existing structure makes extraction clearly cheaper."
+        ]
+      },
+      {
+        "id": "T2",
+        "title": "Reorder result hierarchy",
+        "details": [
+          "Place finding and caveat above measured signals.",
+          "Make publications/projects/software/datasets visually scannable."
+        ]
+      },
+      {
+        "id": "T3",
+        "title": "Improve measured-signal presentation",
+        "details": [
+          "Format large integers with separators.",
+          "Show zero as valid data and unavailable as a distinct state.",
+          "Expose a short trend measurement explanation."
+        ]
+      },
+      {
+        "id": "T4",
+        "title": "Tighten homepage positioning",
+        "details": [
+          "Keep Find what is missing in research.",
+          "Add at most one line such as Detect measurable gaps across research, funding and reusable outputs using the OpenAIRE Graph.",
+          "Optionally retain a small Built with OpenAIRE Graph footer."
+        ]
+      },
+      {
+        "id": "T5",
+        "title": "Preserve basic accessibility",
+        "details": [
+          "Maintain semantic headings, keyboard-accessible example topics, visible focus, and understandable external link labels.",
+          "Verify 1366x768 and mobile-width readability using existing project tooling/manual checks."
+        ]
+      }
+    ],
+    "acceptance": [
+      "A judge can identify the finding, caveat, and four entity counts quickly.",
+      "Large counts are formatted.",
+      "Zero and unavailable are visually distinct.",
+      "Trend exposes a basis or insufficient-data label.",
+      "Homepage stays minimal and OpenAIRE role is understandable.",
+      "Result UI remains usable on common laptop and mobile widths."
+    ],
+    "validate": [
+      "npm test",
+      "npm run lint",
+      "npm run build"
+    ]
+  },
+  "judge": {
+    "must_check": [
+      "Finding and caveat are prominent.",
+      "Measured signals are visible without being buried in prose.",
+      "No decorative feature expansion was introduced.",
+      "Homepage contains no feature-wall bloat.",
+      "Accessibility basics are preserved.",
+      "Dependency 0001.result-semantics-freeze is already accepted.",
+      "Dependency 0003.evidence-chain is already accepted.",
+      "Dependency 0004.golden-demo-contracts is already accepted."
+    ],
+    "reject_if": [
+      "The caveat is hidden or removed for visual simplicity.",
+      "A new design system or major visualization dependency is introduced.",
+      "UI treats missing data as zero.",
+      "The homepage becomes more complex than the current KISS product.",
+      "The implementation fabricates OpenAIRE counts, records, links, trends, or gap evidence.",
+      "The implementation expands the frozen MVP taxonomy beyond funding gap, reuse gap, and no strong structural gap.",
+      "The implementation weakens validation or changes validation commands merely to obtain a passing result.",
+      "The implementation modifies files outside the repository-mapped minimal scope for this pack.",
+      "The implementation introduces unrelated architecture or feature work."
+    ]
+  },
+  "execution_policy": {
+    "max_attempts": 3,
+    "on_max_attempts": "stop_and_keep_todo"
+  },
+  "validation_notes": {
+    "validation_profile": "repo_inspection_required",
+    "commands_are_profile_based": false,
+    "targeted_contract_coverage": "Exact OpenGap test framework and concrete test files are not present in the conversation. Before execution, map package scripts and existing focused/component/e2e tests, then select the narrowest existing targets that protect this pack plus the repository normal full validation command where appropriate.",
+    "missing_targets": [
+      "actual OpenGap source file paths",
+      "actual OpenGap test file paths",
+      "actual package/build/typecheck/lint/test commands"
+    ],
+    "completion_needed": true,
+    "completion_reason": "OpenGap repository paths and exact validation targets were not supplied; repository mapping is required before execution."
+  },
+  "completion_policy": {
+    "pre_execution_completion_allowed": true,
+    "completion_reason": "repo_mapping_and_validation_target_completion",
+    "planner_may_complete": [
+      "machine_core.files.allow",
+      "machine_core.files.create",
+      "machine_core.validate"
+    ],
+    "planner_must_not": [
+      "expand product scope",
+      "weaken validation",
+      "remove acceptance criteria",
+      "remove reject_if rules",
+      "invent test filenames",
+      "invent production files",
+      "change product taxonomy",
+      "mutate secrets or deployment credentials"
+    ],
+    "completion_constraints": [
+      "Inspect the actual OpenGap repository before filling file scope or commands.",
+      "Map only existing files that directly implement the behavior described by this pack.",
+      "New test files may be added only when the existing test layout clearly supports them and they are listed in machine_core.files.create.",
+      "Use exact runnable commands from the repository; no shell globs and no invented scripts.",
+      "After completion, perform a deterministic schema and scope recheck before coder execution."
+    ],
+    "requires_deterministic_recheck": true
+  },
+  "evidence_matrix_requested_from_coder": true,
+  "expected_coder_final_response": [
+    "## Implementation Summary",
+    "### What changed",
+    "### Why this approach",
+    "### What was explicitly not changed",
+    "## Files modified",
+    "## Validation",
+    "## Evidence Matrix",
+    "| Requirement | Evidence |",
+    "|---|---|",
+    "## Known limitations",
+    "## Suggested next pack"
+  ]
+}

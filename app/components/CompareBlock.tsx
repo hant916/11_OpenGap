@@ -28,9 +28,9 @@ export function CompareBlock({ metrics, baseline }: CompareBlockProps) {
         {METRIC_LABELS.map(({ key, label }) => (
           <li key={key} className="result-compare-row">
             <span className="result-compare-label">{label}</span>
-            <span className="result-compare-value">{metrics[key]}</span>
+            <span className="result-compare-value">{metrics[key].toLocaleString()}</span>
             <span className="result-compare-value result-compare-base">
-              {baseline.metrics[key]}
+              {baseline.metrics[key].toLocaleString()}
             </span>
             <span className="result-compare-ratio">
               {ratioLabel(metrics[key], baseline.metrics[key])}
