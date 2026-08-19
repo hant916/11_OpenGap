@@ -262,6 +262,13 @@ body {
   color: #718096;
 }
 
+.result-evidence-id {
+  font-size: 0.8125rem;
+  color: #718096;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
 .result-evidence-link {
   font-size: 0.8125rem;
   color: #2b6cb0;
