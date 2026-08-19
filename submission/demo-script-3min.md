@@ -1,54 +1,66 @@
-# 3-Minute Demo Script
+# Two-Minute Demo Narrative (locked)
 
-## 0:00–0:25 — Problem
+This script locks the demo narrative for the judged walkthrough. Live OpenAIRE
+results remain authoritative; if a live number differs from the recorded
+reference values below, present the live number and keep the same narrative.
 
-“Researchers can already search papers. The harder question is: *is there actually a gap worth investigating?* That normally means jumping between papers, funded projects, software and datasets.”
+## 0:00–0:20 — Problem
 
-## 0:25–0:45 — Product
+"Researchers can already search papers. The harder question is: *is there actually
+a gap worth investigating?* That normally means jumping between papers, funded
+projects, software and datasets."
 
-“OpenGap turns one research topic into a potential gap, explains why, and keeps the OpenAIRE evidence visible.”
+## 0:20–0:40 — Product
 
-Enter the pre-tested golden topic: **Quantum Computing** (https://11-open-gap.vercel.app/).
+"OpenGap turns one research topic into a potential, evidence-backed gap signal:
+it scans OpenAIRE, normalizes the entity signals, runs a deterministic heuristic,
+and shows you why — with the OpenAIRE records behind it."
 
-## 0:45–1:20 — Finding
+Open https://11-open-gap.vercel.app/.
 
-Click **Find gaps**.
+## 0:40–1:20 — AI Agent Governance (cautious funding signal)
+
+Click the **AI Agent Governance** example.
+
+Say: "This scan shows a cautious funding signal: publications strongly outnumber
+directly matching project records. The finding is deliberately phrased as a
+signal worth checking — not as proof that funding is missing. If OpenAIRE failed,
+OpenGap would refuse to invent a finding."
 
 Point to:
 
-- finding title;
-- publications/projects/software/datasets;
-- trend.
+- the finding title;
+- publications vs projects;
+- the "why" bullets.
 
-Say:
+## 1:20–1:50 — Climate Adaptation (reuse-signal reading)
 
-“The finding is not an LLM opinion. A small deterministic rule evaluates the measured OpenAIRE signals.”
+Click the **Climate Adaptation** example.
 
-## 1:20–1:55 — Why + evidence
+Say: "This topic shows the reuse-signal reading: publications vastly outweigh
+reusable software and data outputs. OpenGap highlights that imbalance from the
+measured signals and keeps the software/dataset evidence visible."
 
-Point to the “Why?” bullets.
+Point to:
 
-Open evidence list.
+- software and datasets counts vs publications;
+- the evidence list (open one record to show it links to a real source).
 
-“Every reason is derived from the numbers, and these are the underlying OpenAIRE records. If OpenAIRE fails, OpenGap refuses to invent a finding.”
+## 1:50–2:00 — Quantum Computing (normal control) and close
 
-## 1:55–2:20 — Compare/refine
+Click the **Quantum Computing** example.
 
-If baseline is stable, show one comparison. Otherwise show refine-topic action.
+Say: "Quantum Computing runs through the same classifier as the normal control —
+we read whatever it finds. The point is not that any of these results prove a gap;
+OpenGap flags a measurable signal and shows you why, and you decide whether to
+investigate."
 
-“This lets the researcher move from a broad intuition toward a narrower, evidence-backed research hypothesis.”
-
-## 2:20–2:50 — Open science / reuse
-
-“The methodology is documented, the result contract is machine-readable, and the artifact is reusable. We deliberately avoided a black-box opportunity score.”
-
-## 2:50–3:00 — Close
-
-“OpenGap: find what's missing in research — and show the evidence.”
+Close: "OpenGap: find what's missing in research — and show the evidence."
 
 ## Demo safety
 
-- Use only one golden live topic in the judged walkthrough.
-- Open result once before presentation to warm caches if allowed.
-- Keep a screenshot backup.
+- Use only the three golden topics in the judged walkthrough.
+- Open each result once before presenting to warm caches if allowed.
+- Keep a screenshot backup of each topic.
 - If live API fails, state it explicitly; do not silently switch to fixture data.
+- Never present the demo fixtures as live OpenAIRE data.

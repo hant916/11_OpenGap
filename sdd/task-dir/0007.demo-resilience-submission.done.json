@@ -1,0 +1,246 @@
+{
+  "schema_version": "impl-pack.v3.convergence",
+  "identity": {
+    "project": "opengap",
+    "batch": "hackathon-freeze",
+    "id": "0007.demo-resilience-submission",
+    "sequence": 7,
+    "slug": "demo-resilience-submission",
+    "title": "Harden demo and submission",
+    "type": "validation_hardening",
+    "pack_kind": "implementation"
+  },
+  "scheduling": {
+    "status_source_of_truth": "filename_suffix",
+    "allowed_suffixes": [
+      "todo",
+      "done"
+    ],
+    "on_success": "rename_todo_to_done",
+    "on_failure": "keep_todo"
+  },
+  "human_pressure": {
+    "one_screen_brief": "Finish the hackathon freeze by hardening empty/no-result/partial/error/broad-query states, validating the deployed golden paths, and updating the minimum submission material so judges understand problem, solution, why OpenAIRE, limitations, and next steps. This is the final pack; after acceptance, feature work stops. Depends on: 0001.result-semantics-freeze, 0002.signal-engine-hardening, 0003.evidence-chain, 0004.golden-demo-contracts, 0005.result-ui-freeze, 0006.explore-next-cleanup.",
+    "why_now": "A live demo failure or unsupported scientific claim can erase the value of otherwise good implementation work at submission time.",
+    "do_not_misread": [
+      "This is a hackathon freeze pack: improve credibility and demo reliability without widening the product surface.",
+      "Repository-specific file paths and validation commands must be mapped from the actual OpenGap repository before execution.",
+      "A measured imbalance is a signal, not proof of a scientific research gap."
+    ],
+    "red_lines": [
+      "Do not add new product features after this pack begins.",
+      "Do not convert API failure or partial entity failure into zero counts.",
+      "Do not add a complex retry/orchestration layer.",
+      "Do not hide limitations from submission material.",
+      "Do not silently use cached data as live."
+    ]
+  },
+  "machine_core": {
+    "goal": "Make OpenGap submission-ready by handling critical runtime failure states, smoke-testing the deployed golden flows, and aligning the repository/submission explanation with the frozen OpenAIRE research-ecosystem-gap thesis.",
+    "red_lines": [
+      "Do not add new product features after this pack begins.",
+      "Do not convert API failure or partial entity failure into zero counts.",
+      "Do not add a complex retry/orchestration layer.",
+      "Do not hide limitations from submission material.",
+      "Do not silently use cached data as live."
+    ],
+    "invariants": [
+      "Empty input does not trigger an API scan.",
+      "No results is not interpreted as a gap.",
+      "Partial entity failure is distinguishable from explicit zero matches.",
+      "Broad query results can still render but may advise narrower scanning.",
+      "Any demo snapshot is real, timestamped, and visibly labeled.",
+      "The final product thesis remains measurable structural imbalances across publications, projects, software, and datasets.",
+      "Dependency 0001.result-semantics-freeze must already be accepted before this pack is accepted.",
+      "Dependency 0002.signal-engine-hardening must already be accepted before this pack is accepted.",
+      "Dependency 0003.evidence-chain must already be accepted before this pack is accepted.",
+      "Dependency 0004.golden-demo-contracts must already be accepted before this pack is accepted.",
+      "Dependency 0005.result-ui-freeze must already be accepted before this pack is accepted.",
+      "Dependency 0006.explore-next-cleanup must already be accepted before this pack is accepted."
+    ],
+    "contracts": [
+      "Critical runtime states: empty input, no evidence, partial entity data, API timeout/error, broad query, malformed external URL, repeated scan, and refresh.",
+      "Submission explanation must include Problem, Solution, Why OpenAIRE, How it works, Demo, Limitations, and Next.",
+      "Limitations must state that count imbalance is not scientific proof, terminology affects matching, heuristics are not yet field-normalized, and OpenGap detects ecosystem-level signals rather than paper-level novelty.",
+      "Feature freeze begins when all P0 acceptance checks and the deployed smoke test pass."
+    ],
+    "failure_semantics": [
+      "Empty input is blocked locally with no API call.",
+      "No results renders insufficient OpenAIRE evidence rather than a potential gap.",
+      "Partial entity failure leaves the failed signal unavailable and prevents any finding that depends on it.",
+      "API error renders a concise retry state; snapshot fallback is allowed only under the transparent golden-demo snapshot contract.",
+      "Malformed external links are omitted or disabled."
+    ],
+    "complexity_budget": {
+      "max_new_files": 2,
+      "max_new_abstractions": 0,
+      "prefer_modify_over_create": true,
+      "prefer_adapt_over_rewrite": true,
+      "forbidden_complexity": [
+        "new database infrastructure",
+        "new authentication or personalization subsystem",
+        "vector database or embeddings pipeline",
+        "multi-agent orchestration",
+        "new design system",
+        "broad backend rewrite"
+      ]
+    },
+    "files": {
+      "allow": [],
+      "create": [],
+      "forbid": [
+        ".everrun/**",
+        "*.log",
+        "runtime artifacts",
+        "runtime history",
+        "generated execution reports",
+        "large generated artifacts",
+        "lockfiles unless explicitly required",
+        "secrets or credential files"
+      ]
+    },
+    "steps": [
+      {
+        "id": "T1",
+        "title": "Harden critical runtime states",
+        "details": [
+          "Implement or verify empty input, no results, partial entity failure, timeout/error, broad query, and unsafe URL handling.",
+          "Keep retry behavior bounded and consistent with the existing networking stack."
+        ]
+      },
+      {
+        "id": "T2",
+        "title": "Run deployed golden smoke tests",
+        "details": [
+          "Verify AI Agent Governance, Climate Adaptation, and Quantum Computing from homepage example click through result/evidence.",
+          "Verify repeat scan, refresh, and at least one evidence link.",
+          "Verify no raw stack/API error reaches the user."
+        ]
+      },
+      {
+        "id": "T3",
+        "title": "Align submission/repository explanation",
+        "details": [
+          "Update existing repository/submission documentation surfaces only; do not create a documentation platform.",
+          "Explain Problem, Solution, Why OpenAIRE, How it works, Demo, Limitations, and Next.",
+          "Use architecture narrative: Topic -> OpenAIRE scan -> normalized entity signals -> deterministic heuristic -> evidence-backed finding."
+        ]
+      },
+      {
+        "id": "T4",
+        "title": "Lock two-minute demo narrative",
+        "details": [
+          "AI Agent Governance demonstrates cautious funding signal.",
+          "Climate Adaptation demonstrates reuse signal.",
+          "Quantum Computing remains a normal-control case.",
+          "Explicitly say OpenGap does not claim this proves a gap; it flags a measurable signal and shows why."
+        ]
+      },
+      {
+        "id": "T5",
+        "title": "Freeze",
+        "details": [
+          "After all P0 gates pass, stop feature development.",
+          "Leave field-aware baselines, geographic/institutional graph signals, richer funding relationships, and evidence-backed facet exploration for post-hackathon work."
+        ]
+      }
+    ],
+    "acceptance": [
+      "Empty input, no results, partial entity failure, API error, broad query, and malformed-link states are safe and understandable.",
+      "The three deployed golden topics complete without raw errors or fabricated output.",
+      "AI and Climate results preserve the frozen semantics and caveats.",
+      "Submission material clearly explains why OpenAIRE enables cross-entity gap detection.",
+      "Submission material includes explicit limitations.",
+      "No new feature family remains in progress after acceptance."
+    ],
+    "validate": [
+      "npm test",
+      "npm run lint",
+      "npm run build"
+    ]
+  },
+  "judge": {
+    "must_check": [
+      "All six prior packs are accepted before final freeze.",
+      "Deployed golden paths work end to end.",
+      "Missing and failed signals are never presented as zero.",
+      "No raw runtime/API error is user-visible.",
+      "Submission copy includes limitations and OpenAIRE-specific value.",
+      "Feature freeze is respected after acceptance.",
+      "Dependency 0001.result-semantics-freeze is already accepted.",
+      "Dependency 0002.signal-engine-hardening is already accepted.",
+      "Dependency 0003.evidence-chain is already accepted.",
+      "Dependency 0004.golden-demo-contracts is already accepted.",
+      "Dependency 0005.result-ui-freeze is already accepted.",
+      "Dependency 0006.explore-next-cleanup is already accepted."
+    ],
+    "reject_if": [
+      "API failure is converted into a potential gap.",
+      "Cached data is presented as live.",
+      "Submission language claims scientific proof or universal absence from scan-level evidence.",
+      "A new feature family is added instead of closing the demo.",
+      "The implementation fabricates OpenAIRE counts, records, links, trends, or gap evidence.",
+      "The implementation expands the frozen MVP taxonomy beyond funding gap, reuse gap, and no strong structural gap.",
+      "The implementation weakens validation or changes validation commands merely to obtain a passing result.",
+      "The implementation modifies files outside the repository-mapped minimal scope for this pack.",
+      "The implementation introduces unrelated architecture or feature work."
+    ]
+  },
+  "execution_policy": {
+    "max_attempts": 3,
+    "on_max_attempts": "stop_and_keep_todo"
+  },
+  "validation_notes": {
+    "validation_profile": "repo_inspection_required",
+    "commands_are_profile_based": false,
+    "targeted_contract_coverage": "Exact OpenGap test framework and concrete test files are not present in the conversation. Before execution, map package scripts and existing focused/component/e2e tests, then select the narrowest existing targets that protect this pack plus the repository normal full validation command where appropriate.",
+    "missing_targets": [
+      "actual OpenGap source file paths",
+      "actual OpenGap test file paths",
+      "actual package/build/typecheck/lint/test commands"
+    ],
+    "completion_needed": true,
+    "completion_reason": "OpenGap repository paths and exact validation targets were not supplied; repository mapping is required before execution."
+  },
+  "completion_policy": {
+    "pre_execution_completion_allowed": true,
+    "completion_reason": "repo_mapping_and_validation_target_completion",
+    "planner_may_complete": [
+      "machine_core.files.allow",
+      "machine_core.files.create",
+      "machine_core.validate"
+    ],
+    "planner_must_not": [
+      "expand product scope",
+      "weaken validation",
+      "remove acceptance criteria",
+      "remove reject_if rules",
+      "invent test filenames",
+      "invent production files",
+      "change product taxonomy",
+      "mutate secrets or deployment credentials"
+    ],
+    "completion_constraints": [
+      "Inspect the actual OpenGap repository before filling file scope or commands.",
+      "Map only existing files that directly implement the behavior described by this pack.",
+      "New test files may be added only when the existing test layout clearly supports them and they are listed in machine_core.files.create.",
+      "Use exact runnable commands from the repository; no shell globs and no invented scripts.",
+      "After completion, perform a deterministic schema and scope recheck before coder execution."
+    ],
+    "requires_deterministic_recheck": true
+  },
+  "evidence_matrix_requested_from_coder": true,
+  "expected_coder_final_response": [
+    "## Implementation Summary",
+    "### What changed",
+    "### Why this approach",
+    "### What was explicitly not changed",
+    "## Files modified",
+    "## Validation",
+    "## Evidence Matrix",
+    "| Requirement | Evidence |",
+    "|---|---|",
+    "## Known limitations",
+    "## Suggested next pack"
+  ]
+}

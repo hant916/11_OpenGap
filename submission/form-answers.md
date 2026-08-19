@@ -34,6 +34,10 @@ Researchers, PIs, lab leads and research engineers considering a new research di
 
 OpenGap uses the OpenAIRE Graph API (V3) research-products and projects endpoints directly over HTTPS to obtain publication, software, dataset and project counts, a recent publication trend, and representative evidence records. No MCP/Alien integration is used in the shipped MVP; the app is fully deterministic and does not depend on an LLM for the finding.
 
+## Why OpenAIRE
+
+OpenAIRE aggregates publications, funded projects, software and datasets into one Graph, so a single topic scan can compare how research is published, funded and translated into reusable outputs. OpenGap turns that cross-entity view into a measurable ecosystem signal instead of re-wording another paper search.
+
 ## Reuse
 
 Others can reuse the OpenAIRE adapter, the small AnalysisResult schema, the documented gap heuristics, evidence-first UX pattern, and tests/fixtures.

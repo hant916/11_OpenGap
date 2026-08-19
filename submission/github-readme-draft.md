@@ -4,16 +4,26 @@
 
 OpenGap is an evidence-first OpenAIRE hackathon app that helps researchers turn a vague research idea into a potential, inspectable research-gap hypothesis.
 
+## Problem
+
+Researchers can search publications, but forming a view of a topic's research ecosystem still means manually comparing papers, funded projects, software and datasets. OpenGap asks whether OpenAIRE can turn those records into a transparent, evidence-backed hypothesis.
+
+## Why OpenAIRE
+
+OpenAIRE aggregates publications, funded projects, software and datasets into one Graph, so one scan can compare how a topic is published, funded and translated into reusable outputs from a single source of record.
+
 ## How it works
 
 ```text
 Topic
   ↓
-OpenAIRE publications / projects / software / datasets
+OpenAIRE scan (publications / projects / software / datasets + trend)
   ↓
-Simple deterministic gap rules
+Normalized entity signals (counts and ratios)
   ↓
-Potential finding + reasons + evidence
+Deterministic heuristic rules
+  ↓
+Evidence-backed potential finding + reasons + evidence
 ```
 
 ## Why this is not another research chatbot
@@ -21,8 +31,17 @@ Potential finding + reasons + evidence
 - The core finding is deterministic.
 - Measured values are shown.
 - Evidence records remain inspectable.
-- Missing provider data is not treated as zero.
+- Missing provider data is not treated as zero; no finding is generated when OpenAIRE is unavailable.
+- Evidence URLs are restricted to safe http/https links.
 - The product says “potential gap”, not “this should be funded”.
+
+## Demo topics
+
+- **AI Agent Governance** — cautious funding signal.
+- **Climate Adaptation** — reuse-signal reading of the measured outputs.
+- **Quantum Computing** — normal control case.
+
+OpenGap does not claim any result proves a gap; it flags a measurable signal and shows why.
 
 ## Run locally
 
@@ -31,7 +50,7 @@ npm install
 npm run dev
 ```
 
-Add environment variables described in `.env.example` when the implementation pack creates them.
+Add environment variables described in `.env.example` when running against a custom OpenAIRE endpoint.
 
 ## Validate
 
