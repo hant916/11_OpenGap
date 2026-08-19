@@ -130,6 +130,8 @@ body {
   font-size: 1.5rem;
   font-weight: 700;
   margin: 0 0 1rem;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .result-finding {
@@ -154,11 +156,15 @@ body {
   font-size: 1.125rem;
   font-weight: 700;
   margin: 0 0 0.25rem;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .result-finding-summary {
   margin: 0;
   color: #2d3748;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .result-section {
@@ -247,6 +253,8 @@ body {
 
 .result-evidence-title {
   font-size: 0.9375rem;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .result-evidence-year {
@@ -257,6 +265,8 @@ body {
 .result-evidence-link {
   font-size: 0.8125rem;
   color: #2b6cb0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .result-actions {
@@ -265,10 +275,72 @@ body {
   justify-content: center;
 }
 
+.result-refinements {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.result-refinement {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.375rem;
+  padding: 0.625rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.result-refinement-kind {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #2b6cb0;
+}
+
+.result-refinement-topic {
+  font-size: 0.9375rem;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.result-refinement-note {
+  font-size: 0.8125rem;
+  color: #718096;
+}
+
 .result-loading {
   margin: 1.5rem 0 0;
   color: #4a5568;
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+}
+
+.result-spinner {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid #bee3f8;
+  border-top-color: #2b6cb0;
+  border-radius: 50%;
+  animation: result-spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes result-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.result-loading-text {
+  margin: 0;
 }
 
 .result-error {

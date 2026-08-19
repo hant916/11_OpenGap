@@ -32,8 +32,9 @@ export function AnalysisResult({
 }: ResultProps) {
   if (status === "loading") {
     return (
-      <section className="result" aria-live="polite">
-        <p className="result-loading">
+      <section className="result result-loading" aria-live="polite">
+        <span className="result-spinner" aria-hidden="true" />
+        <p className="result-loading-text">
           Checking publications, projects, software and datasets in OpenAIRE…
         </p>
       </section>
