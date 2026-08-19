@@ -2,6 +2,7 @@
 
 import type { AnalysisResult as AnalysisResultData } from "@/lib/domain";
 import { TREND_LABELS } from "@/lib/domain";
+import { EvidenceList } from "./EvidenceList";
 
 type Status = "loading" | "error" | "result";
 
@@ -19,13 +20,6 @@ const METRIC_LABELS = [
   { key: "software", label: "Software" },
   { key: "datasets", label: "Datasets" },
 ] as const;
-
-const EVIDENCE_TYPE_LABELS: Record<string, string> = {
-  publication: "Publication",
-  project: "Project",
-  software: "Software",
-  dataset: "Dataset",
-};
 
 export function AnalysisResult({
   status,
@@ -107,29 +101,7 @@ export function AnalysisResult({
       {result.evidence.length > 0 && (
         <section className="result-section">
           <h3 className="result-section-title">Evidence</h3>
-          <ul className="result-evidence">
-            {result.evidence.map((item) => (
-              <li key={item.id} className="result-evidence-item">
-                <span className="result-evidence-type">
-                  {EVIDENCE_TYPE_LABELS[item.type] ?? item.type}
-                </span>
-                <span className="result-evidence-title">{item.title}</span>
-                {item.year !== undefined && (
-                  <span className="result-evidence-year">{item.year}</span>
-                )}
-                {item.url && (
-                  <a
-                    className="result-evidence-link"
-                    href={item.url}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    OpenAIRE record
-                  </a>
-                )}
-              </li>
-            ))}
-          </ul>
+          <EvidenceList items={result.evidence} />
         </section>
       )}
 

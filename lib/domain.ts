@@ -24,6 +24,11 @@ export type EvidenceItem = {
   year?: number;
   url?: string;
   source: "openaire";
+  isFixture?: boolean;
+};
+
+export const SOURCE_LABELS: Record<EvidenceItem["source"], string> = {
+  openaire: "OpenAIRE",
 };
 
 export type GapType =
