@@ -1,0 +1,218 @@
+{
+  "schema_version": "impl-pack.v3.convergence",
+  "identity": {
+    "project": "opengap",
+    "batch": "hackathon-freeze",
+    "id": "0006.explore-next-cleanup",
+    "sequence": 6,
+    "slug": "explore-next-cleanup",
+    "title": "Clean up suggested next scans",
+    "type": "runtime_governance",
+    "pack_kind": "implementation"
+  },
+  "scheduling": {
+    "status_source_of_truth": "filename_suffix",
+    "allowed_suffixes": [
+      "todo",
+      "done"
+    ],
+    "on_success": "rename_todo_to_done",
+    "on_failure": "keep_todo"
+  },
+  "human_pressure": {
+    "one_screen_brief": "Replace the current generic five-item Try next list with a maximum of three topic-specific next scans. Suggestions must never display unmeasured counts or imply OpenAIRE evidence before the user actually scans the suggested topic. Depends on: 0001.result-semantics-freeze, 0002.signal-engine-hardening, 0004.golden-demo-contracts.",
+    "why_now": "The existing generic recommendations are the most obvious LLM-table-of-contents artifact left in the product and weaken the OpenAIRE differentiation.",
+    "do_not_misread": [
+      "This is a hackathon freeze pack: improve credibility and demo reliability without widening the product surface.",
+      "Repository-specific file paths and validation commands must be mapped from the actual OpenGap repository before execution.",
+      "A measured imbalance is a signal, not proof of a scientific research gap."
+    ],
+    "red_lines": [
+      "Do not build a new facet-extraction subsystem during the hackathon freeze.",
+      "Do not show counts for a suggestion unless those counts were actually measured.",
+      "Do not let LLM-generated suggestions override classifier output.",
+      "Do not keep the current five generic template categories as the default."
+    ]
+  },
+  "machine_core": {
+    "goal": "Make next-step exploration clearly distinguish suggested query ideas from measured OpenAIRE evidence, with at most three concise next scans that run through the normal production pipeline when clicked.",
+    "red_lines": [
+      "Do not build a new facet-extraction subsystem during the hackathon freeze.",
+      "Do not show counts for a suggestion unless those counts were actually measured.",
+      "Do not let LLM-generated suggestions override classifier output.",
+      "Do not keep the current five generic template categories as the default."
+    ],
+    "invariants": [
+      "A clicked suggestion always runs the normal scan pipeline.",
+      "Unscanned suggestions are labeled as suggestions, not evidence.",
+      "Suggestion count is capped at three.",
+      "Measured facet counts, if present, come from a real scan.",
+      "Dependency 0001.result-semantics-freeze must already be accepted before this pack is accepted.",
+      "Dependency 0002.signal-engine-hardening must already be accepted before this pack is accepted.",
+      "Dependency 0004.golden-demo-contracts must already be accepted before this pack is accepted."
+    ],
+    "contracts": [
+      "Deadline-safe mode is Suggested next scans with no fake metrics.",
+      "If evidence-backed facets already exist in the codebase, they may display real measured counts.",
+      "An LLM, if already used, may suggest only query strings; it may not generate counts, trend, evidence, or finding kind."
+    ],
+    "failure_semantics": [
+      "If suggestions cannot be generated safely, omit the section rather than emit generic filler.",
+      "If a suggested scan fails, use normal scan error handling.",
+      "Unknown suggestion provenance must not be presented as OpenAIRE-derived evidence."
+    ],
+    "complexity_budget": {
+      "max_new_files": 2,
+      "max_new_abstractions": 1,
+      "prefer_modify_over_create": true,
+      "prefer_adapt_over_rewrite": true,
+      "forbidden_complexity": [
+        "new database infrastructure",
+        "new authentication or personalization subsystem",
+        "vector database or embeddings pipeline",
+        "multi-agent orchestration",
+        "new design system",
+        "broad backend rewrite"
+      ]
+    },
+    "files": {
+      "allow": [],
+      "create": [],
+      "forbid": [
+        ".everrun/**",
+        "*.log",
+        "runtime artifacts",
+        "runtime history",
+        "generated execution reports",
+        "large generated artifacts",
+        "lockfiles unless explicitly required",
+        "secrets or credential files"
+      ]
+    },
+    "steps": [
+      {
+        "id": "T1",
+        "title": "Map current suggestion generator",
+        "details": [
+          "Locate the source of narrower/adjacent suggestions and determine whether they are template-, rule-, or LLM-generated.",
+          "Keep only the minimum existing mechanism needed for the demo."
+        ]
+      },
+      {
+        "id": "T2",
+        "title": "Rename and cap suggestions",
+        "details": [
+          "Use Suggested next scans unless suggestions already have measured OpenAIRE facet evidence.",
+          "Return at most three topic-specific suggestions."
+        ]
+      },
+      {
+        "id": "T3",
+        "title": "Remove implied evidence",
+        "details": [
+          "Do not render counts, trend, or gap labels before a real scan.",
+          "Keep narrower/adjacent labels only if they are helpful and truthful."
+        ]
+      },
+      {
+        "id": "T4",
+        "title": "Route clicks through production scan",
+        "details": [
+          "On click, feed the suggestion into the same input/scan/classification/evidence path as a manually entered topic.",
+          "Do not create a demo-only shortcut."
+        ]
+      }
+    ],
+    "acceptance": [
+      "Suggested next scans are capped at three.",
+      "No unscanned suggestion displays a fabricated or implied measured count.",
+      "Clicking a suggestion executes the normal scan pipeline.",
+      "Generic five-item template output is removed from the default result.",
+      "Suggestion generation cannot change finding semantics."
+    ],
+    "validate": [
+      "npm test",
+      "npm run lint",
+      "npm run build"
+    ]
+  },
+  "judge": {
+    "must_check": [
+      "Suggestions are clearly suggestions unless measured.",
+      "No fake counts or evidence appear in next-scan items.",
+      "Suggestion click path reaches the production scanner.",
+      "The section is omitted rather than filled with generic content when safe suggestions are unavailable.",
+      "Dependency 0001.result-semantics-freeze is already accepted.",
+      "Dependency 0002.signal-engine-hardening is already accepted.",
+      "Dependency 0004.golden-demo-contracts is already accepted."
+    ],
+    "reject_if": [
+      "The current generic five-item template list remains unchanged.",
+      "An unscanned suggestion shows publication/project/software/dataset counts.",
+      "An LLM-generated suggestion directly sets a finding kind.",
+      "A new facet subsystem is introduced during the freeze.",
+      "The implementation fabricates OpenAIRE counts, records, links, trends, or gap evidence.",
+      "The implementation expands the frozen MVP taxonomy beyond funding gap, reuse gap, and no strong structural gap.",
+      "The implementation weakens validation or changes validation commands merely to obtain a passing result.",
+      "The implementation modifies files outside the repository-mapped minimal scope for this pack.",
+      "The implementation introduces unrelated architecture or feature work."
+    ]
+  },
+  "execution_policy": {
+    "max_attempts": 3,
+    "on_max_attempts": "stop_and_keep_todo"
+  },
+  "validation_notes": {
+    "validation_profile": "repo_inspection_required",
+    "commands_are_profile_based": false,
+    "targeted_contract_coverage": "Exact OpenGap test framework and concrete test files are not present in the conversation. Before execution, map package scripts and existing focused/component/e2e tests, then select the narrowest existing targets that protect this pack plus the repository normal full validation command where appropriate.",
+    "missing_targets": [
+      "actual OpenGap source file paths",
+      "actual OpenGap test file paths",
+      "actual package/build/typecheck/lint/test commands"
+    ],
+    "completion_needed": true,
+    "completion_reason": "OpenGap repository paths and exact validation targets were not supplied; repository mapping is required before execution."
+  },
+  "completion_policy": {
+    "pre_execution_completion_allowed": true,
+    "completion_reason": "repo_mapping_and_validation_target_completion",
+    "planner_may_complete": [
+      "machine_core.files.allow",
+      "machine_core.files.create",
+      "machine_core.validate"
+    ],
+    "planner_must_not": [
+      "expand product scope",
+      "weaken validation",
+      "remove acceptance criteria",
+      "remove reject_if rules",
+      "invent test filenames",
+      "invent production files",
+      "change product taxonomy",
+      "mutate secrets or deployment credentials"
+    ],
+    "completion_constraints": [
+      "Inspect the actual OpenGap repository before filling file scope or commands.",
+      "Map only existing files that directly implement the behavior described by this pack.",
+      "New test files may be added only when the existing test layout clearly supports them and they are listed in machine_core.files.create.",
+      "Use exact runnable commands from the repository; no shell globs and no invented scripts.",
+      "After completion, perform a deterministic schema and scope recheck before coder execution."
+    ],
+    "requires_deterministic_recheck": true
+  },
+  "evidence_matrix_requested_from_coder": true,
+  "expected_coder_final_response": [
+    "## Implementation Summary",
+    "### What changed",
+    "### Why this approach",
+    "### What was explicitly not changed",
+    "## Files modified",
+    "## Validation",
+    "## Evidence Matrix",
+    "| Requirement | Evidence |",
+    "|---|---|",
+    "## Known limitations",
+    "## Suggested next pack"
+  ]
+}

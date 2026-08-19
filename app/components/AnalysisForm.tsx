@@ -125,6 +125,7 @@ export default function AnalysisForm() {
           error={error}
           onRetry={() => void analyze(topic)}
           onReset={reset}
+          onSelectSuggestion={(suggestion) => void analyze(suggestion)}
         />
       )}
     </>

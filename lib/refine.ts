@@ -8,7 +8,7 @@ export type Refinement = {
 };
 
 export const MIN_REFINEMENTS = 3;
-export const MAX_REFINEMENTS = 5;
+export const MAX_REFINEMENTS = 3;
 
 const NARROWER_FACETS = [
   "methods and frameworks",
@@ -39,5 +39,5 @@ export function deriveRefinements(topic: string): Refinement[] {
     note: "An adjacent facet of this topic to scan next.",
   }));
 
-  return [...narrower, ...adjacent];
+  return [...narrower, ...adjacent].slice(0, MAX_REFINEMENTS);
 }
