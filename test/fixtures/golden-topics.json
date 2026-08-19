@@ -1,0 +1,21 @@
+{
+  "_comment": "Observed reference signals for the three demo topics, recorded 19 Aug 2026 from live OpenAIRE scans (AI and Climate values per the golden-demo pack invariants; Quantum values per the README production demo verification). Live OpenAIRE data remains authoritative and may change classification. These are classifier fixtures only and are never rendered as live data.",
+  "ai_agent_governance": {
+    "publications": 3263,
+    "projects": 0,
+    "software": 164,
+    "datasets": 171
+  },
+  "climate_adaptation": {
+    "publications": 127940,
+    "projects": 1010,
+    "software": 402,
+    "datasets": 6012
+  },
+  "quantum_computing": {
+    "publications": 66546,
+    "projects": 816,
+    "software": 544,
+    "datasets": 1549
+  }
+}

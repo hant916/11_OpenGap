@@ -2,13 +2,8 @@
 
 import { useState, type FormEvent } from "react";
 import type { AnalysisResult as AnalysisResultData } from "@/lib/domain";
+import { EXAMPLE_TOPICS } from "@/lib/example-topics";
 import { AnalysisResult } from "./AnalysisResult";
-
-const EXAMPLE_TOPICS = [
-  "AI Agent Governance",
-  "Climate Adaptation",
-  "Quantum Computing",
-];
 
 type AnalyzeError = {
   code: string;
