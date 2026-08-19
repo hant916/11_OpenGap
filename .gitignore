@@ -3,7 +3,17 @@ everrun.toml
 .everrunignore
 .everrun/
 .opencode/
-node_modules/
-dist/
 sdd/task-dir/
 sdd/archives/
+
+# dependencies
+node_modules/
+
+# Next.js build output
+.next/
+out/
+dist/
+
+# environment
+.env
+.env*.local
