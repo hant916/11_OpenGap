@@ -2,6 +2,8 @@
 everrun.toml
 .everrunignore
 .everrun/
+.opencode/
 node_modules/
 dist/
 sdd/task-dir/
+sdd/archives/

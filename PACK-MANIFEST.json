@@ -1,0 +1,31 @@
+{
+  "pack": "opengap-openaire-hackathon-impl-pack",
+  "version": "1.0.0",
+  "generated_date": "2026-08-19",
+  "product": "OpenGap",
+  "primary_theme": "Theme B - Build",
+  "deadline": "2026-08-20T23:59:00+01:00",
+  "internal_cutoff_france": "2026-08-20T22:30:00+02:00",
+  "impl_pack_schema": "impl-pack.v3.convergence",
+  "task_count": 12,
+  "core_loop": [
+    "idea",
+    "analyze",
+    "potential_gap",
+    "why",
+    "evidence",
+    "refine"
+  ],
+  "p0_deliverables": [
+    "deployed_app",
+    "source_repository",
+    "openaire_live_data",
+    "documented_methodology",
+    "evidence_records",
+    "tests",
+    "1-2_page_story",
+    "submission_form_answers",
+    "demo_script",
+    "license"
+  ]
+}

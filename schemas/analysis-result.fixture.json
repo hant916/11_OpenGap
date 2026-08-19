@@ -1,0 +1,31 @@
+{
+  "topic": "AI Agent Governance",
+  "metrics": {
+    "publications": 142,
+    "projects": 18,
+    "software": 6,
+    "datasets": 3
+  },
+  "trend": "growing",
+  "finding": {
+    "type": "translation_gap",
+    "title": "Potential translation gap",
+    "summary": "Research activity is materially stronger than reusable technical output in this illustrative fixture.",
+    "reasons": [
+      "142 publications were found versus 9 software/data outputs.",
+      "Reusable outputs represent about 6% of the publication count in this illustrative fixture.",
+      "Publication activity is growing across the compared year windows."
+    ]
+  },
+  "evidence": [
+    {
+      "id": "fixture-publication-1",
+      "type": "publication",
+      "title": "Illustrative publication fixture \u2014 replace with live OpenAIRE record",
+      "year": 2026,
+      "source": "openaire"
+    }
+  ],
+  "methodologyVersion": "mvp-1",
+  "retrievedAt": "2026-08-19T00:00:00Z"
+}

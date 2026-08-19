@@ -1,0 +1,172 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/opengap/analysis-result.schema.json",
+  "title": "OpenGap AnalysisResult",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "topic",
+    "metrics",
+    "trend",
+    "finding",
+    "evidence",
+    "methodologyVersion",
+    "retrievedAt"
+  ],
+  "properties": {
+    "topic": {
+      "type": "string",
+      "minLength": 1
+    },
+    "metrics": {
+      "$ref": "#/$defs/metrics"
+    },
+    "trend": {
+      "enum": [
+        "growing",
+        "stable",
+        "declining",
+        "insufficient_data"
+      ]
+    },
+    "finding": {
+      "$ref": "#/$defs/finding"
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/evidence"
+      },
+      "maxItems": 20
+    },
+    "baseline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "topic",
+        "metrics"
+      ],
+      "properties": {
+        "topic": {
+          "type": "string",
+          "minLength": 1
+        },
+        "metrics": {
+          "$ref": "#/$defs/metrics"
+        }
+      }
+    },
+    "methodologyVersion": {
+      "const": "mvp-1"
+    },
+    "retrievedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "$defs": {
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "publications",
+        "projects",
+        "software",
+        "datasets"
+      ],
+      "properties": {
+        "publications": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "projects": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "software": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "datasets": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "title",
+        "summary",
+        "reasons"
+      ],
+      "properties": {
+        "type": {
+          "enum": [
+            "translation_gap",
+            "project_gap",
+            "sparse_evidence",
+            "no_strong_gap"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reasons": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "maxItems": 3
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "type",
+        "title",
+        "source"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "enum": [
+            "publication",
+            "project",
+            "software",
+            "dataset"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "year": {
+          "type": "integer",
+          "minimum": 1900,
+          "maximum": 2100
+        },
+        "url": {
+          "type": "string"
+        },
+        "source": {
+          "const": "openaire"
+        }
+      }
+    }
+  }
+}
