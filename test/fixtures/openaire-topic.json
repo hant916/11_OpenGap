@@ -1,0 +1,53 @@
+{
+  "_comment": "Illustrative, hand-normalized OpenAIRE-shaped fixture for tests and demo. No secrets, no live identifiers, no real records. Evidence is marked isFixture and titled as a fixture; replace with live OpenAIRE records before any production use.",
+  "counts": {
+    "publications": 15,
+    "projects": 2,
+    "software": 4,
+    "datasets": 6
+  },
+  "yearBuckets": [
+    { "year": 2022, "publications": 2 },
+    { "year": 2023, "publications": 3 },
+    { "year": 2024, "publications": 4 },
+    { "year": 2025, "publications": 6 }
+  ],
+  "evidence": [
+    {
+      "id": "fixture-publication-1",
+      "type": "publication",
+      "title": "Illustrative publication fixture \u2014 replace with live OpenAIRE record",
+      "year": 2024,
+      "url": "https://example.invalid/fixture/publication-1",
+      "source": "openaire",
+      "isFixture": true
+    },
+    {
+      "id": "fixture-software-1",
+      "type": "software",
+      "title": "Illustrative software fixture \u2014 replace with live OpenAIRE record",
+      "year": 2025,
+      "url": "https://example.invalid/fixture/software-1",
+      "source": "openaire",
+      "isFixture": true
+    },
+    {
+      "id": "fixture-dataset-1",
+      "type": "dataset",
+      "title": "Illustrative dataset fixture \u2014 replace with live OpenAIRE record",
+      "year": 2024,
+      "url": "https://example.invalid/fixture/dataset-1",
+      "source": "openaire",
+      "isFixture": true
+    },
+    {
+      "id": "fixture-project-1",
+      "type": "project",
+      "title": "Illustrative project fixture \u2014 replace with live OpenAIRE record",
+      "year": 2023,
+      "url": "https://example.invalid/fixture/project-1",
+      "source": "openaire",
+      "isFixture": true
+    }
+  ]
+}
