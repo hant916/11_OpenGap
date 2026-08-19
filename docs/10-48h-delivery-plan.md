@@ -106,3 +106,30 @@ Never kill:
 ## Stop condition
 
 At internal cutoff minus 4 hours, **no new product feature may start**. Remaining work is defects, deploy, screenshots and submission only.
+
+## Everrun execution notes
+
+The implementation packs were executed sequentially with `everrun run`. The
+following operational issues were encountered and resolved without weakening
+the product or release checks:
+
+- **Windows runner shell was rejected.** Everrun did not support the default
+  PowerShell environment. Running it from Git Bash with `MSYSTEM=MINGW64`
+  provided a supported shell.
+- **The legacy Jest flag was incompatible with this Vitest project.** The
+  original `npm test -- --runInBand` validation command failed because Vitest
+  does not accept `--runInBand`. Each affected pack now uses `npm test`.
+- **A deployment initially lacked the analysis route.** Required source files
+  had not been included in the remote commit, so Vercel returned `404` for
+  `/api/analyze`. Committing and pushing the live analysis implementation,
+  then triggering a fresh deployment, restored the route; production smoke
+  tests now return real OpenAIRE data.
+- **Everrun can report Windows `[Errno 22] Invalid argument` while changing
+  packs.** The accepted recovery is to confirm the prior process has exited
+  and restart exactly one `everrun run` process. Never start a second runner
+  concurrently. This resumed 0011 and 0012 without lost work.
+- **The final external submission cannot be automated by the CLI.** The
+  remaining release gate is the human action to submit on the hackathon
+  platform and retain its confirmation. This is recorded in
+  `submission/final-submission-checklist.md`; it must be completed before the
+  release can be marked submitted.
