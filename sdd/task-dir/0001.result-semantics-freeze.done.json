@@ -1,0 +1,212 @@
+{
+  "schema_version": "impl-pack.v3.convergence",
+  "identity": {
+    "project": "opengap",
+    "batch": "hackathon-freeze",
+    "id": "0001.result-semantics-freeze",
+    "sequence": 1,
+    "slug": "result-semantics-freeze",
+    "title": "Freeze result semantics",
+    "type": "runtime_governance",
+    "pack_kind": "implementation"
+  },
+  "scheduling": {
+    "status_source_of_truth": "filename_suffix",
+    "allowed_suffixes": [
+      "todo",
+      "done"
+    ],
+    "on_success": "rename_todo_to_done",
+    "on_failure": "keep_todo"
+  },
+  "human_pressure": {
+    "one_screen_brief": "Current OpenGap results can turn raw count imbalance into an overly certain gap. Freeze result semantics so the product reports measurable signals with cautious interpretation. Only three result classes are allowed: potential_funding_gap, potential_reuse_gap, and no_strong_structural_gap. Non-goals: no new gap taxonomy, no LLM-generated scientific certainty, no field-normalization research.",
+    "why_now": "Credible wording is the highest-risk hackathon issue because judges can challenge a hard claim immediately even when the underlying OpenAIRE counts are real.",
+    "do_not_misread": [
+      "This is a hackathon freeze pack: improve credibility and demo reliability without widening the product surface.",
+      "Repository-specific file paths and validation commands must be mapped from the actual OpenGap repository before execution.",
+      "A measured imbalance is a signal, not proof of a scientific research gap."
+    ],
+    "red_lines": [
+      "Do not use translation gap in the MVP.",
+      "Do not say that zero matching project records proves that no funded projects exist.",
+      "Do not claim OpenGap proves a scientific research gap.",
+      "Do not add geographic, collaboration, institution, citation, policy, maturity, or other gap types."
+    ]
+  },
+  "machine_core": {
+    "goal": "Implement one centralized, deterministic result-semantics layer for the three frozen OpenGap finding classes and ensure every flagged finding contains scan-scoped uncertainty language.",
+    "red_lines": [
+      "Do not use translation gap in the MVP.",
+      "Do not say that zero matching project records proves that no funded projects exist.",
+      "Do not claim OpenGap proves a scientific research gap.",
+      "Do not add geographic, collaboration, institution, citation, policy, maturity, or other gap types."
+    ],
+    "invariants": [
+      "Every flagged finding is explicitly labeled as potential.",
+      "Every flagged finding contains a caveat describing uncertainty.",
+      "No-strong-structural-gap is a valid first-class result, not an error state.",
+      "Display copy must remain derived from a structured finding kind rather than becoming the classification mechanism."
+    ],
+    "contracts": [
+      "potential_funding_gap means substantial research activity with weak or absent directly matching funded-project activity in the current scan.",
+      "potential_reuse_gap means substantial research activity with comparatively limited reusable software and dataset output in the current scan.",
+      "no_strong_structural_gap means the measured signals do not cross the current heuristic threshold for a supported imbalance.",
+      "A measured imbalance is a signal, not proof of an underlying scientific or funding condition."
+    ],
+    "failure_semantics": [
+      "If the finding cannot be classified safely from measured signals, return no_strong_structural_gap or an insufficient-evidence state rather than inventing certainty.",
+      "Unknown or unavailable signals must not be silently treated as zero.",
+      "Do not convert API failure into a gap claim."
+    ],
+    "complexity_budget": {
+      "max_new_files": 2,
+      "max_new_abstractions": 1,
+      "prefer_modify_over_create": true,
+      "prefer_adapt_over_rewrite": true,
+      "forbidden_complexity": [
+        "new database infrastructure",
+        "new authentication or personalization subsystem",
+        "vector database or embeddings pipeline",
+        "multi-agent orchestration",
+        "new design system",
+        "broad backend rewrite"
+      ]
+    },
+    "files": {
+      "allow": [],
+      "create": [],
+      "forbid": [
+        ".everrun/**",
+        "*.log",
+        "runtime artifacts",
+        "runtime history",
+        "generated execution reports",
+        "large generated artifacts",
+        "lockfiles unless explicitly required",
+        "secrets or credential files"
+      ]
+    },
+    "steps": [
+      {
+        "id": "T1",
+        "title": "Locate current finding semantics",
+        "details": [
+          "Map the current finding model, labels, copy, and classification-to-display path.",
+          "Identify every place where translation gap, absolute zero-project claims, or direct count-to-gap wording is produced."
+        ]
+      },
+      {
+        "id": "T2",
+        "title": "Centralize the frozen taxonomy",
+        "details": [
+          "Represent exactly potential_funding_gap, potential_reuse_gap, and no_strong_structural_gap as structured values.",
+          "Keep classification kind separate from display text."
+        ]
+      },
+      {
+        "id": "T3",
+        "title": "Harden wording",
+        "details": [
+          "For zero project matches say: No directly matching project records were found in this scan.",
+          "Funding caveat must mention an underfunded area or terminology mismatch as possible interpretations.",
+          "Reuse caveat must state that output patterns vary by field and the imbalance is not proof of under-translation.",
+          "Rename generic Why? to Why OpenGap flagged this or equivalent."
+        ]
+      },
+      {
+        "id": "T4",
+        "title": "Add safe no-gap state",
+        "details": [
+          "Ensure a topic with no supported strong imbalance can render No strong structural gap detected.",
+          "Clarify that this does not mean there are no open research questions."
+        ]
+      }
+    ],
+    "acceptance": [
+      "Only the three frozen finding classes can be produced on the MVP result path.",
+      "Zero project matches are always described as directly matching records in the current scan, never as universal absence.",
+      "Potential reuse gap replaces translation gap for the Climate Adaptation-style signal.",
+      "Every flagged result shows a visible uncertainty caveat.",
+      "No strong structural gap is renderable as a normal result."
+    ],
+    "validate": []
+  },
+  "judge": {
+    "must_check": [
+      "The result taxonomy is centralized and deterministic.",
+      "AI Agent Governance-style zero-project wording is scan-scoped and cautious.",
+      "Climate Adaptation-style reuse wording does not claim translation failure.",
+      "Every flagged finding exposes a caveat.",
+      "No strong structural gap is supported without being treated as failure."
+    ],
+    "reject_if": [
+      "Any MVP path still emits translation gap.",
+      "Any MVP path claims zero matching projects means no funded projects exist.",
+      "Any finding omits uncertainty language.",
+      "Display copy itself becomes the source of classification truth.",
+      "The implementation fabricates OpenAIRE counts, records, links, trends, or gap evidence.",
+      "The implementation expands the frozen MVP taxonomy beyond funding gap, reuse gap, and no strong structural gap.",
+      "The implementation weakens validation or changes validation commands merely to obtain a passing result.",
+      "The implementation modifies files outside the repository-mapped minimal scope for this pack.",
+      "The implementation introduces unrelated architecture or feature work."
+    ]
+  },
+  "execution_policy": {
+    "max_attempts": 3,
+    "on_max_attempts": "stop_and_keep_todo"
+  },
+  "validation_notes": {
+    "validation_profile": "repo_inspection_required",
+    "commands_are_profile_based": false,
+    "targeted_contract_coverage": "Exact OpenGap test framework and concrete test files are not present in the conversation. Before execution, map package scripts and existing focused/component/e2e tests, then select the narrowest existing targets that protect this pack plus the repository normal full validation command where appropriate.",
+    "missing_targets": [
+      "actual OpenGap source file paths",
+      "actual OpenGap test file paths",
+      "actual package/build/typecheck/lint/test commands"
+    ],
+    "completion_needed": true,
+    "completion_reason": "OpenGap repository paths and exact validation targets were not supplied; repository mapping is required before execution."
+  },
+  "completion_policy": {
+    "pre_execution_completion_allowed": true,
+    "completion_reason": "repo_mapping_and_validation_target_completion",
+    "planner_may_complete": [
+      "machine_core.files.allow",
+      "machine_core.files.create",
+      "machine_core.validate"
+    ],
+    "planner_must_not": [
+      "expand product scope",
+      "weaken validation",
+      "remove acceptance criteria",
+      "remove reject_if rules",
+      "invent test filenames",
+      "invent production files",
+      "change product taxonomy",
+      "mutate secrets or deployment credentials"
+    ],
+    "completion_constraints": [
+      "Inspect the actual OpenGap repository before filling file scope or commands.",
+      "Map only existing files that directly implement the behavior described by this pack.",
+      "New test files may be added only when the existing test layout clearly supports them and they are listed in machine_core.files.create.",
+      "Use exact runnable commands from the repository; no shell globs and no invented scripts.",
+      "After completion, perform a deterministic schema and scope recheck before coder execution."
+    ],
+    "requires_deterministic_recheck": true
+  },
+  "evidence_matrix_requested_from_coder": true,
+  "expected_coder_final_response": [
+    "## Implementation Summary",
+    "### What changed",
+    "### Why this approach",
+    "### What was explicitly not changed",
+    "## Files modified",
+    "## Validation",
+    "## Evidence Matrix",
+    "| Requirement | Evidence |",
+    "|---|---|",
+    "## Known limitations",
+    "## Suggested next pack"
+  ]
+}

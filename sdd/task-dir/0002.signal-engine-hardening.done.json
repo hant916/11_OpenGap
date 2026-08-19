@@ -1,0 +1,222 @@
+{
+  "schema_version": "impl-pack.v3.convergence",
+  "identity": {
+    "project": "opengap",
+    "batch": "hackathon-freeze",
+    "id": "0002.signal-engine-hardening",
+    "sequence": 2,
+    "slug": "signal-engine-hardening",
+    "title": "Harden signal classification",
+    "type": "validation_hardening",
+    "pack_kind": "implementation"
+  },
+  "scheduling": {
+    "status_source_of_truth": "filename_suffix",
+    "allowed_suffixes": [
+      "todo",
+      "done"
+    ],
+    "on_success": "rename_todo_to_done",
+    "on_failure": "keep_todo"
+  },
+  "human_pressure": {
+    "one_screen_brief": "Separate OpenAIRE raw counts, normalized signals, derived ratios, heuristic flags, finding classification, and display copy. Keep the existing working heuristics unless correctness requires change; do not invent pseudo-scientific field baselines during the deadline freeze. Depends on: 0001.result-semantics-freeze.",
+    "why_now": "The product must show that its findings come from deterministic measured signals rather than generated prose.",
+    "do_not_misread": [
+      "This is a hackathon freeze pack: improve credibility and demo reliability without widening the product surface.",
+      "Repository-specific file paths and validation commands must be mapped from the actual OpenGap repository before execution.",
+      "A measured imbalance is a signal, not proof of a scientific research gap."
+    ],
+    "red_lines": [
+      "Do not introduce a new model service, vector store, or research-normalization subsystem.",
+      "Do not let an LLM generate counts, ratios, trends, or finding kinds.",
+      "Do not silently coerce missing entity results to zero.",
+      "Do not churn heuristic thresholds solely to make the demo look better."
+    ]
+  },
+  "machine_core": {
+    "goal": "Make OpenGap signal derivation and finding classification deterministic, numerically safe, and independent from display copy or LLM-generated text.",
+    "red_lines": [
+      "Do not introduce a new model service, vector store, or research-normalization subsystem.",
+      "Do not let an LLM generate counts, ratios, trends, or finding kinds.",
+      "Do not silently coerce missing entity results to zero.",
+      "Do not churn heuristic thresholds solely to make the demo look better."
+    ],
+    "invariants": [
+      "Reusable outputs equal software plus datasets whenever both signals are available.",
+      "Division by zero never produces NaN or Infinity in product state.",
+      "The same normalized signals always yield the same finding.",
+      "Raw OpenAIRE counts remain the source of truth.",
+      "Finding classification is separate from copy rendering.",
+      "Dependency 0001.result-semantics-freeze must already be accepted before this pack is accepted."
+    ],
+    "contracts": [
+      "Pipeline order is raw OpenAIRE response -> normalized counts -> derived metrics -> signal flags -> finding classification -> display copy.",
+      "Missing and explicit zero are distinct states.",
+      "Heuristic thresholds are product heuristics, not field-normalized scientific truth.",
+      "Trend must be derived from explicit temporal evidence or downgraded to insufficient_data."
+    ],
+    "failure_semantics": [
+      "If required source signals are unavailable, do not classify a funding/reuse gap from missing values.",
+      "If reusable ratio cannot be computed safely, keep it unavailable.",
+      "If trend evidence is insufficient, return insufficient_data rather than Growing."
+    ],
+    "complexity_budget": {
+      "max_new_files": 2,
+      "max_new_abstractions": 1,
+      "prefer_modify_over_create": true,
+      "prefer_adapt_over_rewrite": true,
+      "forbidden_complexity": [
+        "new database infrastructure",
+        "new authentication or personalization subsystem",
+        "vector database or embeddings pipeline",
+        "multi-agent orchestration",
+        "new design system",
+        "broad backend rewrite"
+      ]
+    },
+    "files": {
+      "allow": [],
+      "create": [],
+      "forbid": [
+        ".everrun/**",
+        "*.log",
+        "runtime artifacts",
+        "runtime history",
+        "generated execution reports",
+        "large generated artifacts",
+        "lockfiles unless explicitly required",
+        "secrets or credential files"
+      ]
+    },
+    "steps": [
+      {
+        "id": "T1",
+        "title": "Map current aggregation pipeline",
+        "details": [
+          "Locate OpenAIRE response normalization, entity counts, ratio calculation, trend calculation, and finding selection.",
+          "Preserve currently correct API behavior."
+        ]
+      },
+      {
+        "id": "T2",
+        "title": "Normalize research signals",
+        "details": [
+          "Represent publications, projects, software, datasets, reusable outputs, and trend explicitly.",
+          "Preserve missing versus zero semantics."
+        ]
+      },
+      {
+        "id": "T3",
+        "title": "Centralize derived metrics and heuristics",
+        "details": [
+          "Calculate project/publication and reusable-output/publication ratios in one deterministic layer.",
+          "Centralize current heuristic thresholds with clear names.",
+          "Do not claim field-normalized significance."
+        ]
+      },
+      {
+        "id": "T4",
+        "title": "Harden trend",
+        "details": [
+          "Use an explicit deterministic time-window basis if the data exists.",
+          "Otherwise downgrade the UI signal to insufficient_data."
+        ]
+      },
+      {
+        "id": "T5",
+        "title": "Connect classification to Pack 01 taxonomy",
+        "details": [
+          "Apply precedence: insufficient evidence first, then funding imbalance, then reuse imbalance, otherwise no strong structural gap.",
+          "If multiple imbalances trigger, choose one primary finding and keep secondary signals non-hero."
+        ]
+      }
+    ],
+    "acceptance": [
+      "Missing counts are not treated as zero.",
+      "Reusable outputs equal software plus datasets when both are known.",
+      "No NaN or Infinity reaches product state.",
+      "Same measured signals produce the same finding kind.",
+      "Trend has an inspectable basis or is insufficient_data.",
+      "Display copy is not used to decide the finding kind."
+    ],
+    "validate": []
+  },
+  "judge": {
+    "must_check": [
+      "Numeric safety for zero and missing values.",
+      "Deterministic classification of frozen finding kinds.",
+      "Trend basis is deterministic or explicitly insufficient.",
+      "Existing valid OpenAIRE count retrieval is not rewritten without necessity.",
+      "Dependency 0001.result-semantics-freeze is already accepted."
+    ],
+    "reject_if": [
+      "An LLM or generated prose decides a count, ratio, trend, or finding class.",
+      "Missing entity results are silently stored as zero.",
+      "Heuristic thresholds are presented as scientific baselines without evidence.",
+      "Thresholds are modified solely to force golden-demo outcomes.",
+      "The implementation fabricates OpenAIRE counts, records, links, trends, or gap evidence.",
+      "The implementation expands the frozen MVP taxonomy beyond funding gap, reuse gap, and no strong structural gap.",
+      "The implementation weakens validation or changes validation commands merely to obtain a passing result.",
+      "The implementation modifies files outside the repository-mapped minimal scope for this pack.",
+      "The implementation introduces unrelated architecture or feature work."
+    ]
+  },
+  "execution_policy": {
+    "max_attempts": 3,
+    "on_max_attempts": "stop_and_keep_todo"
+  },
+  "validation_notes": {
+    "validation_profile": "repo_inspection_required",
+    "commands_are_profile_based": false,
+    "targeted_contract_coverage": "Exact OpenGap test framework and concrete test files are not present in the conversation. Before execution, map package scripts and existing focused/component/e2e tests, then select the narrowest existing targets that protect this pack plus the repository normal full validation command where appropriate.",
+    "missing_targets": [
+      "actual OpenGap source file paths",
+      "actual OpenGap test file paths",
+      "actual package/build/typecheck/lint/test commands"
+    ],
+    "completion_needed": true,
+    "completion_reason": "OpenGap repository paths and exact validation targets were not supplied; repository mapping is required before execution."
+  },
+  "completion_policy": {
+    "pre_execution_completion_allowed": true,
+    "completion_reason": "repo_mapping_and_validation_target_completion",
+    "planner_may_complete": [
+      "machine_core.files.allow",
+      "machine_core.files.create",
+      "machine_core.validate"
+    ],
+    "planner_must_not": [
+      "expand product scope",
+      "weaken validation",
+      "remove acceptance criteria",
+      "remove reject_if rules",
+      "invent test filenames",
+      "invent production files",
+      "change product taxonomy",
+      "mutate secrets or deployment credentials"
+    ],
+    "completion_constraints": [
+      "Inspect the actual OpenGap repository before filling file scope or commands.",
+      "Map only existing files that directly implement the behavior described by this pack.",
+      "New test files may be added only when the existing test layout clearly supports them and they are listed in machine_core.files.create.",
+      "Use exact runnable commands from the repository; no shell globs and no invented scripts.",
+      "After completion, perform a deterministic schema and scope recheck before coder execution."
+    ],
+    "requires_deterministic_recheck": true
+  },
+  "evidence_matrix_requested_from_coder": true,
+  "expected_coder_final_response": [
+    "## Implementation Summary",
+    "### What changed",
+    "### Why this approach",
+    "### What was explicitly not changed",
+    "## Files modified",
+    "## Validation",
+    "## Evidence Matrix",
+    "| Requirement | Evidence |",
+    "|---|---|",
+    "## Known limitations",
+    "## Suggested next pack"
+  ]
+}

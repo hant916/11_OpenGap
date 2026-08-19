@@ -1,0 +1,227 @@
+{
+  "schema_version": "impl-pack.v3.convergence",
+  "identity": {
+    "project": "opengap",
+    "batch": "hackathon-freeze",
+    "id": "0003.evidence-chain",
+    "sequence": 3,
+    "slug": "evidence-chain",
+    "title": "Build inspectable evidence chain",
+    "type": "reporting",
+    "pack_kind": "implementation"
+  },
+  "scheduling": {
+    "status_source_of_truth": "filename_suffix",
+    "allowed_suffixes": [
+      "todo",
+      "done"
+    ],
+    "on_success": "rename_todo_to_done",
+    "on_failure": "keep_todo"
+  },
+  "human_pressure": {
+    "one_screen_brief": "Make every OpenGap finding auditable from measured signal to representative OpenAIRE records. Evidence must be visibly distinct from interpretation, and a zero project match must be represented as a scan result rather than a fabricated record. Depends on: 0001.result-semantics-freeze, 0002.signal-engine-hardening.",
+    "why_now": "The hackathon value proposition depends on OpenAIRE-backed evidence; without an inspectable chain the product can be mistaken for generic AI summarization.",
+    "do_not_misread": [
+      "This is a hackathon freeze pack: improve credibility and demo reliability without widening the product surface.",
+      "Repository-specific file paths and validation commands must be mapped from the actual OpenGap repository before execution.",
+      "A measured imbalance is a signal, not proof of a scientific research gap."
+    ],
+    "red_lines": [
+      "Do not fabricate placeholder evidence records.",
+      "Do not expose API tokens, credentials, or raw secret-bearing payloads.",
+      "Do not imply sampled records alone prove the aggregate count.",
+      "Do not replace valid external record URLs with synthetic routes unless the existing architecture already proxies them safely."
+    ]
+  },
+  "machine_core": {
+    "goal": "Expose a minimal, typed, source-linked evidence chain for each result: measured signals, why it was flagged, representative OpenAIRE records, and scan provenance.",
+    "red_lines": [
+      "Do not fabricate placeholder evidence records.",
+      "Do not expose API tokens, credentials, or raw secret-bearing payloads.",
+      "Do not imply sampled records alone prove the aggregate count.",
+      "Do not replace valid external record URLs with synthetic routes unless the existing architecture already proxies them safely."
+    ],
+    "invariants": [
+      "Evidence and interpretation are separate concepts in the result model.",
+      "Every evidence record has an entity type, title, source, and openable URL.",
+      "Zero project matches are represented as a count/provenance fact, not as a fake project entry.",
+      "Any and-N-more count is derived accurately and never negative.",
+      "Dependency 0001.result-semantics-freeze must already be accepted before this pack is accepted.",
+      "Dependency 0002.signal-engine-hardening must already be accepted before this pack is accepted."
+    ],
+    "contracts": [
+      "Supported evidence entity types are publication, project, software, and dataset.",
+      "Source for these evidence records is OpenAIRE.",
+      "Minimal provenance retains topic, source, and collection time when available.",
+      "A result must expose the measured signals that caused the classifier to flag it."
+    ],
+    "failure_semantics": [
+      "Malformed or unsafe record URLs are omitted or rendered non-clickable instead of emitted as links.",
+      "Unknown year or metadata is omitted rather than rendered as undefined/null text.",
+      "Duplicate evidence records are suppressed by stable identifier or URL where practical."
+    ],
+    "complexity_budget": {
+      "max_new_files": 2,
+      "max_new_abstractions": 1,
+      "prefer_modify_over_create": true,
+      "prefer_adapt_over_rewrite": true,
+      "forbidden_complexity": [
+        "new database infrastructure",
+        "new authentication or personalization subsystem",
+        "vector database or embeddings pipeline",
+        "multi-agent orchestration",
+        "new design system",
+        "broad backend rewrite"
+      ]
+    },
+    "files": {
+      "allow": [],
+      "create": [],
+      "forbid": [
+        ".everrun/**",
+        "*.log",
+        "runtime artifacts",
+        "runtime history",
+        "generated execution reports",
+        "large generated artifacts",
+        "lockfiles unless explicitly required",
+        "secrets or credential files"
+      ]
+    },
+    "steps": [
+      {
+        "id": "T1",
+        "title": "Map current evidence model and renderer",
+        "details": [
+          "Locate evidence normalization, record type information, external links, and result list rendering.",
+          "Preserve currently working OpenAIRE record links."
+        ]
+      },
+      {
+        "id": "T2",
+        "title": "Type evidence records",
+        "details": [
+          "Ensure each item carries publication/project/software/dataset type, title, source, URL, and optional year.",
+          "Avoid leaking raw response objects into presentation."
+        ]
+      },
+      {
+        "id": "T3",
+        "title": "Group visible evidence",
+        "details": [
+          "Group representative evidence by entity type or research/funded activity.",
+          "For zero project matches show 0 directly matching project records found in this scan."
+        ]
+      },
+      {
+        "id": "T4",
+        "title": "Add minimal provenance",
+        "details": [
+          "Retain normalized topic, OpenAIRE source, and collectedAt when available.",
+          "Expose a compact Measured from OpenAIRE records for this topic scan explanation."
+        ]
+      },
+      {
+        "id": "T5",
+        "title": "Harden counts and links",
+        "details": [
+          "Deduplicate representative records where possible.",
+          "Ensure any remaining-count indicator is mathematically correct."
+        ]
+      }
+    ],
+    "acceptance": [
+      "Every flagged result visibly shows the measured counts that support the finding.",
+      "Evidence records are typed and open to their actual source records.",
+      "Zero project matches render as a scan result rather than fabricated evidence.",
+      "Interpretation and evidence are visibly distinguishable.",
+      "No secret-bearing API payload is exposed.",
+      "Any and-N-more indicator is accurate."
+    ],
+    "validate": [
+      "npm test",
+      "npm run lint",
+      "npm run build"
+    ]
+  },
+  "judge": {
+    "must_check": [
+      "Finding -> measured signals -> why flagged -> OpenAIRE record links is inspectable.",
+      "Evidence types match record categories.",
+      "Zero-project handling contains no fabricated record.",
+      "Record URLs are safe and openable.",
+      "Provenance is present without leaking secrets.",
+      "Dependency 0001.result-semantics-freeze is already accepted.",
+      "Dependency 0002.signal-engine-hardening is already accepted."
+    ],
+    "reject_if": [
+      "A finding is shown with no visible measured evidence.",
+      "A placeholder or fake evidence record is created.",
+      "A raw secret or token appears in UI, logs, or generated evidence output.",
+      "Evidence type does not match the underlying record.",
+      "The implementation fabricates OpenAIRE counts, records, links, trends, or gap evidence.",
+      "The implementation expands the frozen MVP taxonomy beyond funding gap, reuse gap, and no strong structural gap.",
+      "The implementation weakens validation or changes validation commands merely to obtain a passing result.",
+      "The implementation modifies files outside the repository-mapped minimal scope for this pack.",
+      "The implementation introduces unrelated architecture or feature work."
+    ]
+  },
+  "execution_policy": {
+    "max_attempts": 3,
+    "on_max_attempts": "stop_and_keep_todo"
+  },
+  "validation_notes": {
+    "validation_profile": "repo_inspection_required",
+    "commands_are_profile_based": false,
+    "targeted_contract_coverage": "Exact OpenGap test framework and concrete test files are not present in the conversation. Before execution, map package scripts and existing focused/component/e2e tests, then select the narrowest existing targets that protect this pack plus the repository normal full validation command where appropriate.",
+    "missing_targets": [
+      "actual OpenGap source file paths",
+      "actual OpenGap test file paths",
+      "actual package/build/typecheck/lint/test commands"
+    ],
+    "completion_needed": true,
+    "completion_reason": "OpenGap repository paths and exact validation targets were not supplied; repository mapping is required before execution."
+  },
+  "completion_policy": {
+    "pre_execution_completion_allowed": true,
+    "completion_reason": "repo_mapping_and_validation_target_completion",
+    "planner_may_complete": [
+      "machine_core.files.allow",
+      "machine_core.files.create",
+      "machine_core.validate"
+    ],
+    "planner_must_not": [
+      "expand product scope",
+      "weaken validation",
+      "remove acceptance criteria",
+      "remove reject_if rules",
+      "invent test filenames",
+      "invent production files",
+      "change product taxonomy",
+      "mutate secrets or deployment credentials"
+    ],
+    "completion_constraints": [
+      "Inspect the actual OpenGap repository before filling file scope or commands.",
+      "Map only existing files that directly implement the behavior described by this pack.",
+      "New test files may be added only when the existing test layout clearly supports them and they are listed in machine_core.files.create.",
+      "Use exact runnable commands from the repository; no shell globs and no invented scripts.",
+      "After completion, perform a deterministic schema and scope recheck before coder execution."
+    ],
+    "requires_deterministic_recheck": true
+  },
+  "evidence_matrix_requested_from_coder": true,
+  "expected_coder_final_response": [
+    "## Implementation Summary",
+    "### What changed",
+    "### Why this approach",
+    "### What was explicitly not changed",
+    "## Files modified",
+    "## Validation",
+    "## Evidence Matrix",
+    "| Requirement | Evidence |",
+    "|---|---|",
+    "## Known limitations",
+    "## Suggested next pack"
+  ]
+}
