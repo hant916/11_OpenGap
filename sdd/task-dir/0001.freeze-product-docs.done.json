@@ -1,0 +1,140 @@
+{
+  "schema_version": "impl-pack.v3.convergence",
+  "identity": {
+    "project": "opengap",
+    "batch": "openaire-hackathon-48h",
+    "id": "0001.freeze-product-docs",
+    "sequence": 1,
+    "slug": "freeze-product-docs",
+    "title": "Freeze product and delivery docs",
+    "type": "product_contract"
+  },
+  "scheduling": {
+    "status_source_of_truth": "filename_suffix",
+    "allowed_suffixes": [
+      "todo",
+      "done"
+    ],
+    "on_success": "rename_todo_to_done",
+    "on_failure": "keep_todo"
+  },
+  "human_pressure": {
+    "one_screen_brief": "Before code, freeze the OpenGap MVP: one researcher persona, one golden user loop, deterministic potential-gap rules, evidence-first output, and the hard OpenAIRE submission requirements. Do not design a general research-intelligence platform.",
+    "why_now": "The deadline is next day; ambiguity now creates rework later.",
+    "do_not_misread": [
+      "This is a 40-hour effective deadline build, not a platform foundation exercise.",
+      "Preserve the IDEA \u2192 ANALYZE \u2192 POTENTIAL GAP \u2192 WHY \u2192 EVIDENCE \u2192 REFINE user loop."
+    ],
+    "red_lines": [
+      "Do not start implementation before the product and scope docs are frozen.",
+      "Do not expand the primary persona set.",
+      "Do not introduce an opportunity score or autonomous agent workflow."
+    ]
+  },
+  "machine_core": {
+    "goal": "Create the minimum repository documentation that freezes product value, MVP scope, architecture, methodology, deadline plan, and submission definition of done.",
+    "red_lines": [
+      "Do not start implementation before the product and scope docs are frozen.",
+      "Do not expand the primary persona set.",
+      "Do not introduce an opportunity score or autonomous agent workflow."
+    ],
+    "invariants": [
+      "Finding wording remains probabilistic/heuristic: potential gap, not proof.",
+      "OpenAIRE evidence remains central to the product."
+    ],
+    "contracts": [],
+    "failure_semantics": [
+      "Missing docs are visible; do not silently proceed with ambiguous product scope."
+    ],
+    "complexity_budget": {
+      "max_new_files": 7,
+      "max_new_abstractions": 0,
+      "prefer_modify_over_create": true,
+      "prefer_adapt_over_rewrite": true,
+      "forbidden_complexity": [
+        "General product strategy deck",
+        "Multi-persona requirements matrix",
+        "Long-term platform roadmap"
+      ]
+    },
+    "files": {
+      "allow": [
+        "README.md",
+        "docs/**",
+        "LICENSE.md"
+      ],
+      "create": [
+        "README.md",
+        "docs/00-product-brief.md",
+        "docs/02-mvp-scope.md",
+        "docs/07-gap-detection-rules.md",
+        "docs/10-48h-delivery-plan.md",
+        "docs/12-definition-of-done.md",
+        "LICENSE.md"
+      ],
+      "forbid": [
+        ".everrun/**",
+        "*.log",
+        "runtime artifacts",
+        "runtime history",
+        "generated execution reports",
+        "large generated artifacts",
+        "lockfiles unless explicitly required"
+      ]
+    },
+    "steps": [
+      {
+        "id": "T1",
+        "title": "Write product brief",
+        "details": [
+          "Define one primary user and one JTBD.",
+          "Use potential-gap language, not opportunity claims."
+        ]
+      },
+      {
+        "id": "T2",
+        "title": "Freeze MVP and red lines",
+        "details": [
+          "List P0, P1 and explicit out-of-scope items.",
+          "State that multi-agent, database, RAG and opportunity scoring are out."
+        ]
+      },
+      {
+        "id": "T3",
+        "title": "Document method and deadline",
+        "details": [
+          "Document deterministic rules and limitations.",
+          "Document internal submission cutoff and kill order."
+        ]
+      }
+    ],
+    "acceptance": [
+      "Product/JTBD is explicit.",
+      "MVP scope and non-goals are explicit.",
+      "Gap rules and methodological limits are documented.",
+      "Deadline runbook and submission DoD exist."
+    ],
+    "validate": [
+      "test -f README.md && test -f docs/00-product-brief.md && test -f docs/02-mvp-scope.md && test -f docs/07-gap-detection-rules.md && test -f docs/10-48h-delivery-plan.md && test -f docs/12-definition-of-done.md && test -f LICENSE.md"
+    ]
+  },
+  "judge": {
+    "must_check": [
+      "Product/JTBD is explicit.",
+      "MVP scope and non-goals are explicit.",
+      "Gap rules and methodological limits are documented.",
+      "Deadline runbook and submission DoD exist."
+    ],
+    "reject_if": [
+      "Validation fails.",
+      "Work expands beyond the declared file scope."
+    ]
+  },
+  "execution_policy": {
+    "max_attempts": 3,
+    "on_max_attempts": "stop_and_keep_todo"
+  },
+  "validation_notes": "Greenfield task suite. Paths are established by earlier packs; run sequentially. Validation commands intentionally use repository-level npm scripts created by the scaffold pack instead of guessed test filenames unless the pack explicitly creates that test file.",
+  "evidence_matrix_requested_from_coder": true,
+  "expected_coder_final_response": "Concise implementation summary, changed files, validation results, and an Evidence Matrix mapping acceptance items to concrete evidence."
+}

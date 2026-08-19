@@ -1,0 +1,7 @@
+# EverRun generated local files
+everrun.toml
+.everrunignore
+.everrun/
+node_modules/
+dist/
+sdd/task-dir/
