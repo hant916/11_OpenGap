@@ -32,7 +32,7 @@ Researchers, PIs, lab leads and research engineers considering a new research di
 
 ## OpenAIRE usage
 
-OpenGap uses OpenAIRE Graph research-product and project data to obtain publication, software, dataset and project counts plus representative evidence records. The provider boundary can also host the hackathon OpenAIRE MCP/Alien integration where available.
+OpenGap uses the OpenAIRE Graph API (V3) research-products and projects endpoints directly over HTTPS to obtain publication, software, dataset and project counts, a recent publication trend, and representative evidence records. No MCP/Alien integration is used in the shipped MVP; the app is fully deterministic and does not depend on an LLM for the finding.
 
 ## Reuse
 
@@ -48,6 +48,6 @@ Submission materials: CC BY 4.0.
 
 ## Links
 
-- Live app: `<ADD DEPLOYED URL>`
-- Source repository: `<ADD REPOSITORY URL>`
-- Demo/video if applicable: `<ADD URL>`
+- Live app: https://11-open-gap.vercel.app/
+- Source repository: https://github.com/hant916/11_OpenGap
+- Demo: no separate video; judged walkthrough follows `submission/demo-script-3min.md` (golden topic `Quantum Computing`).

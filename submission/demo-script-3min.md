@@ -8,7 +8,7 @@
 
 “OpenGap turns one research topic into a potential gap, explains why, and keeps the OpenAIRE evidence visible.”
 
-Enter the pre-tested golden topic.
+Enter the pre-tested golden topic: **Quantum Computing** (https://11-open-gap.vercel.app/).
 
 ## 0:45–1:20 — Finding
 
