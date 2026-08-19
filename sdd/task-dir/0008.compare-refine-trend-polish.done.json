@@ -1,0 +1,135 @@
+{
+  "schema_version": "impl-pack.v3.convergence",
+  "identity": {
+    "project": "opengap",
+    "batch": "openaire-hackathon-48h",
+    "id": "0008.compare-refine-trend-polish",
+    "sequence": 8,
+    "slug": "compare-refine-trend-polish",
+    "title": "Add low-cost compare and refine features",
+    "type": "product_polish"
+  },
+  "scheduling": {
+    "status_source_of_truth": "filename_suffix",
+    "allowed_suffixes": [
+      "todo",
+      "done"
+    ],
+    "on_success": "rename_todo_to_done",
+    "on_failure": "keep_todo"
+  },
+  "human_pressure": {
+    "one_screen_brief": "Only after P0 is green, add the two highest-value low-cost enhancements: optional one-topic baseline comparison and simple refine suggestions. Keep trend visual minimal.",
+    "why_now": "These features make the gap more interpretable without adding a new product workflow.",
+    "do_not_misread": [
+      "This is a 40-hour effective deadline build, not a platform foundation exercise.",
+      "Preserve the IDEA \u2192 ANALYZE \u2192 POTENTIAL GAP \u2192 WHY \u2192 EVIDENCE \u2192 REFINE user loop."
+    ],
+    "red_lines": [
+      "Do not create multi-baseline benchmarking.",
+      "Do not add a dashboard.",
+      "Do not add a charting dependency solely for this task."
+    ]
+  },
+  "machine_core": {
+    "goal": "Add optional baseline analysis, direct ratio comparison, 3\u20135 refine suggestions, and a minimal trend presentation without changing the core route/result contract.",
+    "red_lines": [
+      "Do not create multi-baseline benchmarking.",
+      "Do not add a dashboard.",
+      "Do not add a charting dependency solely for this task."
+    ],
+    "invariants": [
+      "P0 user loop remains unchanged."
+    ],
+    "contracts": [],
+    "failure_semantics": [],
+    "complexity_budget": {
+      "max_new_files": 2,
+      "max_new_abstractions": 1,
+      "prefer_modify_over_create": true,
+      "prefer_adapt_over_rewrite": true,
+      "forbidden_complexity": [
+        "Benchmarking engine",
+        "Recommendation system",
+        "Visualization framework"
+      ]
+    },
+    "files": {
+      "allow": [
+        "lib/analyze.ts",
+        "lib/refine.ts",
+        "app/page.tsx",
+        "app/components/AnalysisResult.tsx",
+        "app/components/CompareBlock.tsx"
+      ],
+      "create": [
+        "lib/refine.ts",
+        "app/components/CompareBlock.tsx"
+      ],
+      "forbid": [
+        ".everrun/**",
+        "*.log",
+        "runtime artifacts",
+        "runtime history",
+        "generated execution reports",
+        "large generated artifacts",
+        "lockfiles unless explicitly required"
+      ]
+    },
+    "steps": [
+      {
+        "id": "T1",
+        "title": "Support optional baseline",
+        "details": [
+          "Analyze exactly one baseline topic.",
+          "Display direct counts/ratio comparison only."
+        ]
+      },
+      {
+        "id": "T2",
+        "title": "Add refine suggestions",
+        "details": [
+          "Return 3\u20135 concise narrower/adjacent topics.",
+          "Suggestions do not claim novelty."
+        ]
+      },
+      {
+        "id": "T3",
+        "title": "Keep trend visual tiny",
+        "details": [
+          "Text label is sufficient; optional sparkline only if trivial."
+        ]
+      }
+    ],
+    "acceptance": [
+      "Core analysis still works without baseline.",
+      "Baseline never changes raw topic metrics.",
+      "Refine suggestions remain optional.",
+      "No new screen is introduced."
+    ],
+    "validate": [
+      "npm test",
+      "npm run lint",
+      "npm run build"
+    ]
+  },
+  "judge": {
+    "must_check": [
+      "Core analysis still works without baseline.",
+      "Baseline never changes raw topic metrics.",
+      "Refine suggestions remain optional.",
+      "No new screen is introduced."
+    ],
+    "reject_if": [
+      "Validation fails.",
+      "Work expands beyond the declared file scope."
+    ]
+  },
+  "execution_policy": {
+    "max_attempts": 3,
+    "on_max_attempts": "stop_and_keep_todo"
+  },
+  "validation_notes": "Greenfield task suite. Paths are established by earlier packs; run sequentially. Validation commands intentionally use repository-level npm scripts created by the scaffold pack instead of guessed test filenames unless the pack explicitly creates that test file.",
+  "evidence_matrix_requested_from_coder": true,
+  "expected_coder_final_response": "Concise implementation summary, changed files, validation results, and an Evidence Matrix mapping acceptance items to concrete evidence."
+}

@@ -2,6 +2,8 @@
 
 import type { AnalysisResult as AnalysisResultData } from "@/lib/domain";
 import { TREND_LABELS } from "@/lib/domain";
+import { deriveRefinements } from "@/lib/refine";
+import { CompareBlock } from "./CompareBlock";
 import { EvidenceList } from "./EvidenceList";
 
 type Status = "loading" | "error" | "result";
@@ -53,6 +55,8 @@ export function AnalysisResult({
     );
   }
 
+  const refinements = deriveRefinements(result.topic);
+
   return (
     <section className="result" aria-live="polite">
       <h2 className="result-topic">{result.topic}</h2>
@@ -97,6 +101,31 @@ export function AnalysisResult({
           </li>
         </ul>
       </section>
+
+      {result.baseline && (
+        <CompareBlock metrics={result.metrics} baseline={result.baseline} />
+      )}
+
+      {refinements.length > 0 && (
+        <section className="result-section">
+          <h3 className="result-section-title">Try next</h3>
+          <ul className="result-refinements">
+            {refinements.map((refinement) => (
+              <li key={refinement.facet} className="result-refinement">
+                <span className="result-refinement-kind">
+                  {refinement.kind}
+                </span>
+                <span className="result-refinement-topic">
+                  {refinement.topic}
+                </span>
+                <span className="result-refinement-note">
+                  {refinement.note}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {result.evidence.length > 0 && (
         <section className="result-section">
