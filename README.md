@@ -2,30 +2,77 @@
 
 **Find what's missing in research — and show the evidence.**
 
-OpenGap is an evidence-first OpenAIRE hackathon app that helps a researcher turn a vague research idea into a potential, inspectable research-gap hypothesis. Enter a topic, and OpenGap queries OpenAIRE for publications, projects, software and datasets, measures a recent publication trend, and applies a small deterministic rule engine to return at most one **potential gap** — with the exact numbers and OpenAIRE evidence behind it.
+OpenGap turns an OpenAIRE topic search into an evidence-backed research-gap hypothesis.
 
-- Live app: https://11-open-gap.vercel.app/
-- Demo topics: `AI Agent Governance`, `Climate Adaptation`, `Quantum Computing`
+- 🔎 Enter a research topic
+- 📊 Compare publications, projects, software and datasets
+- ⚙️ Apply deterministic gap-detection rules
+- 🔗 Inspect the OpenAIRE evidence behind every finding
 
-## Why OpenAIRE
+**[Try the live demo →](https://11-open-gap.vercel.app/)**
 
-OpenAIRE aggregates publications, funded projects, software and datasets into one Graph, so a topic scan can compare how research is published, funded and translated into reusable outputs from a single source of record. OpenGap uses that cross-entity view to surface a measurable ecosystem signal instead of re-wording another paper search.
+Demo topics: `AI Agent Governance` · `Climate Adaptation` · `Quantum Computing`
+
+![OpenGap result for Climate Adaptation](submission/screenshots/5-hero-climate-adaptation.png)
+
+## Example
+
+### Climate Adaptation
+
+**Potential funding gap**
+
+Publications outweigh directly matching funded project records in this scan.
+
+| Signal | Value |
+|---|---:|
+| Publications | 127,958 |
+| Projects | 1,010 |
+| Software | 402 |
+| Datasets | 6,015 |
+| Projects / publications | ~1% |
+
+OpenGap does not claim this proves a research gap. It identifies a measurable
+imbalance worth investigating and links the result back to OpenAIRE evidence.
+
+## Why OpenAIRE makes this possible
+
+Traditional literature search mostly answers:
+
+> What has been published?
+
+OpenAIRE lets OpenGap ask a different question:
+
+> How does publication activity compare with funding, software and
+> reusable datasets around the same topic?
+
+OpenAIRE aggregates publications, funded projects, software and datasets into
+one Graph, so a single topic scan can compare how research is published,
+funded and translated into reusable outputs from one source of record. That
+cross-entity view is the core signal OpenGap uses — not another paper search.
 
 ## How it works
 
 ```text
-Topic
-  ↓
-OpenAIRE scan (publications / projects / software / datasets + trend)
-  ↓
-Normalized entity signals (counts and ratios)
-  ↓
-Deterministic heuristic rules
-  ↓
-Evidence-backed potential finding + reasons + evidence
+Browser
+   │
+   ▼
+Next.js
+   │
+   ├── /api/analyze
+   │       │
+   │       ▼
+   │   OpenAIRE Graph API v3
+   │
+   ▼
+Deterministic gap rules
+   │
+   ▼
+AnalysisResult + evidence
 ```
 
-OpenGap is one small Next.js (App Router) application. There is no database and no separate backend service; the server-side `/api/analyze` route calls OpenAIRE Graph API V3 and returns a stable `AnalysisResult` contract.
+OpenGap is one small Next.js (App Router) application. There is no database
+and no separate backend service; the server-side `/api/analyze` route calls
+OpenAIRE Graph API V3 and returns a stable `AnalysisResult` contract.
 
 ## Why this is not another research chatbot
 
@@ -67,22 +114,18 @@ npm run test
 npm run build
 ```
 
-## Production demo (verified 19 Aug 2026)
+## Demo & reproducibility
 
-Three demo topics are wired into the homepage examples and pass the golden demo contract tests:
+The three homepage examples are covered by golden demo contract tests. Live
+OpenAIRE data remains authoritative, so exact counts — and even which gap
+type is flagged — can change between runs. The [Example](#example) above
+(Climate Adaptation, captured 2026-08-20) shows one real run end to end.
 
-- **AI Agent Governance** demonstrates a cautious funding signal — measured publications strongly outnumber directly matching project records, and the finding is phrased as a signal worth checking, not as proof.
-- **Climate Adaptation** is the reuse-signal demo topic — its measured signals show publications vastly outweighing reusable software/data outputs, and the narrative shows how to read that reusable-output imbalance from the evidence.
-- **Quantum Computing** is the normal-control case: it runs through the same deterministic classifier and the result is read as-is, whether that resolves to a gap signal or a no-strong-gap result.
+OpenGap never fabricates results when OpenAIRE is unavailable: the API
+returns a structured `OPENAIRE_UNAVAILABLE` error instead of a stack trace
+or a silent zero.
 
-A live analysis for `Quantum Computing` has returned a gap finding from 66,546 publications, 816 projects, 544 software records and 1,549 datasets; the exact classification can change because live OpenAIRE data remains authoritative. The rendered result includes the finding, reasons, measured signals, refinements and representative OpenAIRE evidence records.
-
-OpenGap does **not** claim any of these results prove a gap. It flags a measurable signal and shows why — the numbers and evidence remain inspectable.
-
-- Evidence links resolve to reachable OpenAIRE records (verified HTTP 200); the API response contains no OpenAIRE token.
-- Screenshots: `submission/screenshots/`.
-
-**Live status (19 Aug 2026):** the deployed app serves the homepage, and any scan whose OpenAIRE call fails returns a clean, structured error (`OPENAIRE_UNAVAILABLE`) with no stack trace or raw API error shown. When the deployment cannot reach the OpenAIRE Graph, results are not fabricated — run locally (`npm run dev`) for live scans against `api.openaire.eu`.
+More screenshots: [`submission/screenshots/`](submission/screenshots/)
 
 ## Next steps (post-hackathon)
 
@@ -90,4 +133,4 @@ Field-aware baselines, geographic/institutional graph signals, richer funding re
 
 ## License
 
-Submission documentation is under CC BY 4.0 (see `LICENSE.md`).
+Submission documentation (this README, `docs/`, `submission/`) is under CC BY 4.0 — see `LICENSE.md`. No separate license has been selected for the source code yet.
