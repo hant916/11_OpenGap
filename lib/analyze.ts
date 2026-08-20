@@ -4,6 +4,7 @@ import type {
   TopicAnalysisRequest,
 } from "./domain";
 import {
+  dedupeEvidence,
   normalizeTopic,
   OpenAireError,
   type OpenAireProvider,
@@ -55,15 +56,23 @@ export async function analyzeTopic(
     };
   }
 
+  const current = now();
+  const retrievedAt = current.toISOString();
+
   return {
     topic,
     metrics: pickMetrics(snapshot.counts),
-    trend: deriveTrend(snapshot.yearBuckets),
+    trend: deriveTrend(snapshot.yearBuckets, current),
     finding: deriveFinding(snapshot.counts, baseline?.metrics),
-    evidence: snapshot.evidence.map(pickEvidence),
+    evidence: dedupeEvidence(snapshot.evidence.map(pickEvidence)),
     ...(baseline ? { baseline } : {}),
     methodologyVersion: "mvp-1",
-    retrievedAt: now().toISOString(),
+    retrievedAt,
+    provenance: {
+      topic,
+      source: "openaire",
+      collectedAt: retrievedAt,
+    },
   };
 }
 
@@ -98,12 +107,21 @@ async function callProvider<T>(run: () => Promise<T>): Promise<T> {
 }
 
 function pickMetrics(counts: MetricCounts): MetricCounts {
-  return {
+  const metrics: MetricCounts = {
     publications: counts.publications,
     projects: counts.projects,
     software: counts.software,
     datasets: counts.datasets,
   };
+  for (const [key, value] of Object.entries(metrics)) {
+    if (typeof value !== "number" || !Number.isFinite(value) || value < 0) {
+      throw new AnalysisError(
+        `OpenAIRE response did not include a valid count for ${key}.`,
+        "OPENAIRE_INVALID_RESPONSE",
+      );
+    }
+  }
+  return metrics;
 }
 
 function pickEvidence(

@@ -1,3 +1,6 @@
+import { GAP_KIND_TITLES } from "./result-semantics";
+import type { GapFinding, GapKind } from "./result-semantics";
+
 export type TopicAnalysisRequest = {
   topic: string;
   baselineTopic?: string;
@@ -27,22 +30,18 @@ export type EvidenceItem = {
   isFixture?: boolean;
 };
 
+export type EvidenceProvenance = {
+  topic: string;
+  source: EvidenceItem["source"];
+  collectedAt: string;
+};
+
 export const SOURCE_LABELS: Record<EvidenceItem["source"], string> = {
   openaire: "OpenAIRE",
 };
 
-export type GapType =
-  | "translation_gap"
-  | "project_gap"
-  | "sparse_evidence"
-  | "no_strong_gap";
-
-export type GapFinding = {
-  type: GapType;
-  title: string;
-  summary: string;
-  reasons: string[];
-};
+export type GapType = GapKind;
+export type { GapFinding };
 
 export type Trend = "growing" | "stable" | "declining" | "insufficient_data";
 
@@ -58,14 +57,10 @@ export type AnalysisResult = {
   };
   methodologyVersion: "mvp-1";
   retrievedAt: string;
+  provenance: EvidenceProvenance;
 };
 
-export const GAP_TYPE_LABELS: Record<GapType, string> = {
-  translation_gap: "Potential translation gap",
-  project_gap: "Potential project gap",
-  sparse_evidence: "Sparse evidence — no reliable gap",
-  no_strong_gap: "No strong gap detected",
-};
+export const GAP_TYPE_LABELS: Record<GapType, string> = GAP_KIND_TITLES;
 
 export const TREND_LABELS: Record<Trend, string> = {
   growing: "Growing",
@@ -73,3 +68,21 @@ export const TREND_LABELS: Record<Trend, string> = {
   declining: "Declining",
   insufficient_data: "Insufficient data",
 };
+
+const SAFE_URL_PROTOCOL = /^https?:\/\//i;
+
+export function safeEvidenceUrl(url: unknown): string | undefined {
+  if (typeof url !== "string") return undefined;
+  const trimmed = url.trim();
+  if (!trimmed) return undefined;
+  if (!SAFE_URL_PROTOCOL.test(trimmed)) return undefined;
+  try {
+    const parsed = new URL(trimmed);
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+      return undefined;
+    }
+    return trimmed;
+  } catch {
+    return undefined;
+  }
+}

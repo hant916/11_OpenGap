@@ -2,6 +2,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { NextRequest } from "next/server";
 import { GET, POST } from "@/app/api/analyze/route";
 import type { MetricCounts } from "@/lib/domain";
+import { deriveFinding } from "@/lib/gap-rules";
+import { EXAMPLE_TOPICS } from "@/lib/example-topics";
+import { ZERO_PROJECT_SCAN_COPY } from "@/lib/result-semantics";
 import {
   createOpenAireProvider,
   OpenAireError,
@@ -9,6 +12,7 @@ import {
   type OpenAireSnapshot,
 } from "@/lib/openaire";
 import fixtureJson from "./fixtures/openaire-topic.json";
+import goldenTopicsJson from "./fixtures/golden-topics.json";
 
 vi.mock("@/lib/openaire", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@/lib/openaire")>();
@@ -82,7 +86,7 @@ describe("analysis route orchestration", () => {
       software: 4,
       datasets: 6,
     });
-    expect(body.finding.type).toBe("no_strong_gap");
+    expect(body.finding.type).toBe("no_strong_structural_gap");
     expect(body.methodologyVersion).toBe("mvp-1");
     expect(typeof body.retrievedAt).toBe("string");
     expect(body.evidence.length).toBeGreaterThan(0);
@@ -185,10 +189,10 @@ describe("missing or failed metrics do not create a gap", () => {
     const res = await POST(jsonRequest({ topic: "AI Agent Governance" }));
 
     expect(res.status).toBe(200);
-    expect((await res.json()).finding.type).toBe("no_strong_gap");
+    expect((await res.json()).finding.type).toBe("no_strong_structural_gap");
   });
 
-  it("flags sparse evidence below the sparse threshold instead of a gap", async () => {
+  it("flags sparse evidence as the no-gap state instead of a gap", async () => {
     providerFactory().mockReturnValue(
       successProvider(
         snapshot({ publications: 9, projects: 0, software: 0, datasets: 0 }),
@@ -197,7 +201,7 @@ describe("missing or failed metrics do not create a gap", () => {
 
     const res = await POST(jsonRequest({ topic: "AI Agent Governance" }));
 
-    expect((await res.json()).finding.type).toBe("sparse_evidence");
+    expect((await res.json()).finding.type).toBe("no_strong_structural_gap");
   });
 
   it("does not create a gap at exactly the sparse threshold", async () => {
@@ -209,24 +213,24 @@ describe("missing or failed metrics do not create a gap", () => {
 
     const res = await POST(jsonRequest({ topic: "AI Agent Governance" }));
 
-    expect((await res.json()).finding.type).toBe("no_strong_gap");
+    expect((await res.json()).finding.type).toBe("no_strong_structural_gap");
   });
 
-  it("triggers a translation gap at the strong-evidence boundary", async () => {
+  it("triggers a potential reuse gap when the project floor is satisfied", async () => {
     providerFactory().mockReturnValue(
       successProvider(
-        snapshot({ publications: 20, projects: 0, software: 2, datasets: 0 }),
+        snapshot({ publications: 20, projects: 4, software: 2, datasets: 0 }),
       ),
     );
 
     const res = await POST(jsonRequest({ topic: "AI Agent Governance" }));
 
     const body = await res.json();
-    expect(body.finding.type).toBe("translation_gap");
+    expect(body.finding.type).toBe("potential_reuse_gap");
     expect(body.finding.reasons.length).toBeGreaterThan(0);
   });
 
-  it("triggers a project gap only when the translation rule does not match first", async () => {
+  it("flags a potential funding gap before the reuse rule", async () => {
     providerFactory().mockReturnValue(
       successProvider(
         snapshot({ publications: 20, projects: 2, software: 30, datasets: 20 }),
@@ -235,7 +239,7 @@ describe("missing or failed metrics do not create a gap", () => {
 
     const res = await POST(jsonRequest({ topic: "AI Agent Governance" }));
 
-    expect((await res.json()).finding.type).toBe("project_gap");
+    expect((await res.json()).finding.type).toBe("potential_funding_gap");
   });
 });
 
@@ -248,5 +252,104 @@ describe("demo-fixture labeling", () => {
       expect(item.title).toContain("Illustrative");
       expect(item.url?.startsWith("https://example.invalid/")).toBe(true);
     }
+  });
+});
+
+describe("golden demo paths (pack 0004)", () => {
+  const golden = goldenTopicsJson as unknown as Record<string, MetricCounts>;
+
+  function goldenSnapshot(counts: MetricCounts): OpenAireSnapshot {
+    return {
+      counts,
+      yearBuckets: [
+        { year: 2022, publications: 1000 },
+        { year: 2023, publications: 1100 },
+        { year: 2024, publications: 1300 },
+        { year: 2025, publications: 1500 },
+      ],
+      evidence: [
+        {
+          id: "golden-pub-1",
+          type: "publication",
+          title: "Golden publication record",
+          year: 2024,
+          source: "openaire",
+        },
+        {
+          id: "golden-ds-1",
+          type: "dataset",
+          title: "Golden dataset record",
+          year: 2025,
+          source: "openaire",
+        },
+      ],
+    };
+  }
+
+  it("example-topic selection covers exactly the three golden demo topics", () => {
+    expect(EXAMPLE_TOPICS).toEqual([
+      "AI Agent Governance",
+      "Climate Adaptation",
+      "Quantum Computing",
+    ]);
+    expect(
+      Object.keys(golden).filter((key) => key !== "_comment").sort(),
+    ).toEqual([
+      "ai_agent_governance",
+      "climate_adaptation",
+      "quantum_computing",
+    ]);
+  });
+
+  it("AI Agent Governance: example-topic scan renders a cautious funding finding", async () => {
+    providerFactory().mockReturnValue(
+      successProvider(goldenSnapshot(golden.ai_agent_governance)),
+    );
+
+    const res = await POST(jsonRequest({ topic: "AI Agent Governance" }));
+
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.topic).toBe("AI Agent Governance");
+    expect(body.metrics).toEqual(golden.ai_agent_governance);
+    expect(body.finding.type).toBe("potential_funding_gap");
+    expect(body.finding.reasons).toContain(ZERO_PROJECT_SCAN_COPY);
+    expect(body.finding.summary).toContain("in this scan");
+    expect(body.evidence.length).toBeGreaterThan(0);
+    expect(
+      body.evidence.every(
+        (item: { isFixture?: boolean }) => item.isFixture !== true,
+      ),
+    ).toBe(true);
+  });
+
+  it("Climate Adaptation: example-topic scan classifies deterministically without translation-gap wording", async () => {
+    providerFactory().mockReturnValue(
+      successProvider(goldenSnapshot(golden.climate_adaptation)),
+    );
+
+    const res = await POST(jsonRequest({ topic: "Climate Adaptation" }));
+
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.topic).toBe("Climate Adaptation");
+    expect(body.metrics).toEqual(golden.climate_adaptation);
+    const wording = body.finding.summary + " " + body.finding.reasons.join(" ");
+    expect(wording).not.toMatch(/translation gap/i);
+    expect(wording).toContain("in this scan");
+  });
+
+  it("Quantum Computing: route result equals the normal deterministic classifier", async () => {
+    providerFactory().mockReturnValue(
+      successProvider(goldenSnapshot(golden.quantum_computing)),
+    );
+
+    const res = await POST(jsonRequest({ topic: "Quantum Computing" }));
+
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.topic).toBe("Quantum Computing");
+    expect(body.metrics).toEqual(golden.quantum_computing);
+    expect(body.finding.type).toBe(deriveFinding(golden.quantum_computing).type);
   });
 });

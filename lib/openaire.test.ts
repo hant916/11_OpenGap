@@ -1,11 +1,13 @@
 import { describe, expect, it, vi } from "vitest";
 import {
   createOpenAireProvider,
+  dedupeEvidence,
   EVIDENCE_PAGE_SIZE,
   normalizeTopic,
   OpenAireError,
   type OpenAireProvider,
 } from "./openaire";
+import type { EvidenceItem } from "./domain";
 
 const BASE_URL = "https://api.openaire.eu";
 
@@ -119,6 +121,36 @@ describe("normalizeTopic", () => {
   it("caps over-long topics at MAX_TOPIC_LENGTH", () => {
     const long = "x".repeat(500);
     expect(normalizeTopic(long)).toHaveLength(200);
+  });
+});
+
+describe("dedupeEvidence", () => {
+  it("suppresses duplicate records by URL, keeping the first occurrence", () => {
+    const items: EvidenceItem[] = [
+      { id: "pub1", type: "publication", title: "A", url: "https://doi.org/10.1/a", source: "openaire" },
+      { id: "pub1", type: "publication", title: "A", url: "https://doi.org/10.1/a", source: "openaire" },
+      { id: "pub2", type: "publication", title: "B", url: "https://doi.org/10.1/b", source: "openaire" },
+    ];
+    expect(dedupeEvidence(items)).toEqual([
+      { id: "pub1", type: "publication", title: "A", url: "https://doi.org/10.1/a", source: "openaire" },
+      { id: "pub2", type: "publication", title: "B", url: "https://doi.org/10.1/b", source: "openaire" },
+    ]);
+  });
+
+  it("suppresses duplicates by stable id when no URL is available", () => {
+    const items: EvidenceItem[] = [
+      { id: "proj1", type: "project", title: "P", source: "openaire" },
+      { id: "proj1", type: "project", title: "P", source: "openaire" },
+    ];
+    expect(dedupeEvidence(items)).toHaveLength(1);
+  });
+
+  it("keeps records that carry no stable id or URL", () => {
+    const items: EvidenceItem[] = [
+      { id: "unknown", type: "publication", title: "A", source: "openaire" },
+      { id: "unknown", type: "publication", title: "B", source: "openaire" },
+    ];
+    expect(dedupeEvidence(items)).toHaveLength(2);
   });
 });
 
@@ -356,5 +388,84 @@ describe("RestOpenAireProvider", () => {
     await expect(provider.analyzeTopic("AI governance")).rejects.toThrowError(
       OpenAireError,
     );
+  });
+
+  it("drops unsafe or malformed evidence URLs instead of emitting them", async () => {
+    const fetchImpl = async (input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.includes("publicationYear")) {
+        return jsonResponse({
+          header: { numFound: 0, page: 1, pageSize: 1 },
+          results: [],
+        });
+      }
+      if (url.includes("/projects")) {
+        return jsonResponse({
+          header: { numFound: 1, page: 1, pageSize: 3 },
+          results: [
+            {
+              id: "proj1",
+              title: "Unsafe project",
+              acronym: "UP",
+              startDate: "2024-01-01",
+              websiteUrl: "javascript:alert(1)",
+            },
+          ],
+        });
+      }
+      return jsonResponse({
+        header: { numFound: 1, page: 1, pageSize: 3 },
+        results: [
+          {
+            id: "pub1",
+            mainTitle: "Unsafe publication",
+            type: "publication",
+            publicationDate: "2024-06-13",
+            pids: [{ scheme: "doi", value: "10.1/x" }],
+            instances: [{ urls: ["data:text/html,<script>1</script>"] }],
+            codeRepositoryUrl: "file:///etc/passwd",
+          },
+        ],
+      });
+    };
+    const provider = makeProvider(fetchImpl);
+    const snapshot = await provider.analyzeTopic("AI governance");
+    for (const item of snapshot.evidence) {
+      expect(item.url).toBeUndefined();
+    }
+  });
+
+  it("handles a broad single-word query and URL-encodes it", async () => {
+    const { fetchImpl, calls } = makeFetch({
+      products: {
+        publication: { numFound: 50000 },
+        software: { numFound: 900 },
+        dataset: { numFound: 3000 },
+      },
+      projectsNumFound: 0,
+      yearCounts: { "2025": 1000, "2024": 900, "2023": 800, "2022": 700 },
+    });
+    const provider = makeProvider(fetchImpl);
+    const snapshot = await provider.analyzeTopic("water");
+    expect(snapshot.counts.publications).toBe(50000);
+    expect(snapshot.counts.software).toBe(900);
+    expect(snapshot.counts.datasets).toBe(3000);
+    expect(snapshot.counts.projects).toBe(0);
+    expect(snapshot.yearBuckets).toHaveLength(4);
+    expect(calls.some((call) => call.includes("search=water"))).toBe(true);
+  });
+
+  it("URL-encodes special characters in the search query", async () => {
+    const { fetchImpl, calls } = makeFetch({
+      products: { publication: { numFound: 3 } },
+      projectsNumFound: 0,
+      yearCounts: {},
+    });
+    const provider = makeProvider(fetchImpl);
+    await provider.analyzeTopic("climate & adaptation + temperature");
+    expect(
+      calls.some((call) => call.includes("search=climate+%26+adaptation+%2B+temperature")),
+    ).toBe(true);
+    expect(calls.every((call) => !call.includes("search=climate & adaptation"))).toBe(true);
   });
 });

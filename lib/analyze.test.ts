@@ -1,10 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { AnalysisError, analyzeTopic } from "./analyze";
+import type { EvidenceItem } from "./domain";
 import {
   OpenAireError,
   type OpenAireProvider,
   type OpenAireSnapshot,
 } from "./openaire";
+import { LOW_EVIDENCE_REASON } from "./result-semantics";
 
 const FIXED_NOW = () => new Date("2026-08-19T12:00:00.000Z");
 
@@ -51,6 +53,7 @@ describe("analyzeTopic", () => {
       "finding",
       "methodologyVersion",
       "metrics",
+      "provenance",
       "retrievedAt",
       "topic",
       "trend",
@@ -64,6 +67,11 @@ describe("analyzeTopic", () => {
     });
     expect(result.methodologyVersion).toBe("mvp-1");
     expect(result.retrievedAt).toBe("2026-08-19T12:00:00.000Z");
+    expect(result.provenance).toEqual({
+      topic: "AI Agent Governance",
+      source: "openaire",
+      collectedAt: "2026-08-19T12:00:00.000Z",
+    });
     expect(result.evidence[0]).toEqual({
       id: "pub1",
       type: "publication",
@@ -91,6 +99,43 @@ describe("analyzeTopic", () => {
     expect(result).not.toHaveProperty("header");
     expect(result.metrics).not.toHaveProperty("numFound");
     expect(JSON.stringify(result)).not.toContain("numFound");
+  });
+
+  it("deduplicates representative evidence by record id", async () => {
+    const duplicateEvidence: EvidenceItem[] = [
+      {
+        id: "pub1",
+        type: "publication",
+        title: "AI governance: a review",
+        year: 2024,
+        source: "openaire",
+      },
+      {
+        id: "pub1",
+        type: "publication",
+        title: "AI governance: a review",
+        year: 2024,
+        source: "openaire",
+      },
+      {
+        id: "ds1",
+        type: "dataset",
+        title: "gov-dataset",
+        source: "openaire",
+      },
+    ];
+    const snapshot = {
+      ...makeSnapshot(),
+      evidence: duplicateEvidence,
+    };
+
+    const result = await analyzeTopic(
+      { topic: "AI Agent Governance" },
+      { provider: makeProvider(snapshot), now: FIXED_NOW },
+    );
+
+    expect(result.evidence).toHaveLength(2);
+    expect(result.evidence.map((item) => item.id)).toEqual(["pub1", "ds1"]);
   });
 
   it("rejects a blank topic with an INVALID_TOPIC analysis error", async () => {
@@ -190,10 +235,11 @@ describe("analyzeTopic", () => {
     );
 
     expect(result.trend).toBe("insufficient_data");
-    expect(result.finding.type).toBe("sparse_evidence");
+    expect(result.finding.type).toBe("no_strong_structural_gap");
+    expect(result.finding.reasons).toContain(LOW_EVIDENCE_REASON);
   });
 
-  it("derives a translation gap when reusable outputs are sparse", async () => {
+  it("derives a potential reuse gap when reusable outputs are sparse", async () => {
     const result = await analyzeTopic(
       { topic: "AI Agent Governance" },
       {
@@ -201,7 +247,7 @@ describe("analyzeTopic", () => {
           makeSnapshot({
             counts: {
               publications: 100,
-              projects: 10,
+              projects: 20,
               software: 5,
               datasets: 1,
             },
@@ -211,7 +257,27 @@ describe("analyzeTopic", () => {
       },
     );
 
-    expect(result.finding.type).toBe("translation_gap");
+    expect(result.finding.type).toBe("potential_reuse_gap");
     expect(result.finding.reasons.length).toBeGreaterThan(0);
+  });
+
+  it("rejects missing entity counts instead of coercing them to zero", async () => {
+    const snapshot = {
+      ...makeSnapshot(),
+      counts: {
+        publications: 100,
+        projects: 5,
+        software: 30,
+      },
+    } as unknown as OpenAireSnapshot;
+
+    await expect(
+      analyzeTopic(
+        { topic: "AI Agent Governance" },
+        { provider: makeProvider(snapshot), now: FIXED_NOW },
+      ),
+    ).rejects.toMatchObject({
+      code: "OPENAIRE_INVALID_RESPONSE",
+    });
   });
 });

@@ -1,8 +1,9 @@
-import type {
-  EvidenceItem,
-  EvidenceType,
-  MetricCounts,
-  YearBucket,
+import {
+  safeEvidenceUrl,
+  type EvidenceItem,
+  type EvidenceType,
+  type MetricCounts,
+  type YearBucket,
 } from "./domain";
 
 export const DEFAULT_OPENAIRE_BASE_URL = "https://api.openaire.eu";
@@ -141,12 +142,12 @@ export class RestOpenAireProvider implements OpenAireProvider {
         projects: projects.count,
       },
       yearBuckets,
-      evidence: [
+      evidence: dedupeEvidence([
         ...publications.evidence,
         ...software.evidence,
         ...datasets.evidence,
         ...projects.evidence,
-      ],
+      ]),
     };
   }
 
@@ -298,7 +299,7 @@ export class RestOpenAireProvider implements OpenAireProvider {
     };
     const year = parseYear(result.publicationDate);
     if (year !== undefined) item.year = year;
-    const url = this.researchProductUrl(result);
+    const url = safeEvidenceUrl(this.researchProductUrl(result));
     if (url) item.url = url;
     return item;
   }
@@ -316,9 +317,8 @@ export class RestOpenAireProvider implements OpenAireProvider {
     };
     const year = parseYear(result.startDate);
     if (year !== undefined) item.year = year;
-    if (typeof result.websiteUrl === "string" && result.websiteUrl) {
-      item.url = result.websiteUrl;
-    }
+    const url = safeEvidenceUrl(result.websiteUrl);
+    if (url) item.url = url;
     return item;
   }
 
@@ -339,6 +339,24 @@ export class RestOpenAireProvider implements OpenAireProvider {
 
 export function createOpenAireProvider(config?: OpenAireConfig): OpenAireProvider {
   return new RestOpenAireProvider(config);
+}
+
+export function dedupeEvidence(items: EvidenceItem[]): EvidenceItem[] {
+  const seen = new Set<string>();
+  const deduped: EvidenceItem[] = [];
+  for (const item of items) {
+    const key = item.url
+      ? `url:${item.url}`
+      : item.id !== "unknown"
+        ? `id:${item.id}`
+        : null;
+    if (key !== null) {
+      if (seen.has(key)) continue;
+      seen.add(key);
+    }
+    deduped.push(item);
+  }
+  return deduped;
 }
 
 function parseYear(dateString?: string | null): number | undefined {

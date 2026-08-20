@@ -1,75 +1,88 @@
-import { GAP_TYPE_LABELS } from "./domain";
-import type { GapFinding, MetricCounts } from "./domain";
+import type { MetricCounts } from "./domain";
+import {
+  RESEARCH_SIGNAL_THRESHOLDS,
+  deriveResearchMetrics,
+} from "./derived-metrics";
+import {
+  FUNDING_CAVEAT,
+  GAP_KIND_TITLES,
+  LOW_EVIDENCE_REASON,
+  NO_STRONG_CLARIFICATION,
+  REUSE_UNCERTAINTY,
+  ZERO_PROJECT_SCAN_COPY,
+  type GapFinding,
+} from "./result-semantics";
 
-export const SPARSE_EVIDENCE_THRESHOLD = 10;
-export const STRONG_EVIDENCE_THRESHOLD = 20;
-export const TRANSLATION_RATIO_MIN = 0.1;
-export const PROJECT_RATIO_MIN = 0.15;
+export const SPARSE_EVIDENCE_THRESHOLD =
+  RESEARCH_SIGNAL_THRESHOLDS.sparseEvidenceMinimumPublications;
+export const STRONG_EVIDENCE_THRESHOLD =
+  RESEARCH_SIGNAL_THRESHOLDS.strongEvidenceMinimumPublications;
+export const REUSE_RATIO_MIN = RESEARCH_SIGNAL_THRESHOLDS.reuseRatioFloor;
+export const PROJECT_RATIO_MIN = RESEARCH_SIGNAL_THRESHOLDS.projectRatioFloor;
 export const MAX_REASONS = 3;
 
 export function deriveFinding(
   counts: MetricCounts,
   baseline?: MetricCounts,
 ): GapFinding {
-  const { publications, projects, software, datasets } = counts;
-  const reusableOutputs = software + datasets;
+  const metrics = deriveResearchMetrics(counts);
+  const { publications } = metrics;
 
   if (publications < SPARSE_EVIDENCE_THRESHOLD) {
     return {
-      type: "sparse_evidence",
-      title: GAP_TYPE_LABELS.sparse_evidence,
-      summary: "The available evidence is too limited for the MVP heuristic.",
-      reasons: [
-        `${publications} publication${publications === 1 ? "" : "s"} were found across the query.`,
-      ],
+      type: "no_strong_structural_gap",
+      title: GAP_KIND_TITLES.no_strong_structural_gap,
+      summary: "This scan found no strong structural imbalance in the measured signals.",
+      reasons: [LOW_EVIDENCE_REASON, NO_STRONG_CLARIFICATION],
     };
   }
 
-  if (
-    publications >= STRONG_EVIDENCE_THRESHOLD &&
-    reusableOutputs <= Math.max(3, Math.round(publications * TRANSLATION_RATIO_MIN))
-  ) {
+  const hasStrongEvidence = publications >= STRONG_EVIDENCE_THRESHOLD;
+
+  if (hasStrongEvidence && metrics.projects <= metrics.projectRecordsFloor) {
+    const reasons =
+      metrics.projects === 0
+        ? [ZERO_PROJECT_SCAN_COPY, FUNDING_CAVEAT]
+        : [
+            `${publications} publications were found versus ${metrics.projects} funded project records in this scan.`,
+            `Project records represent about ${Math.round((metrics.projects / publications) * 100)}% of the publication count in this scan.`,
+            FUNDING_CAVEAT,
+          ];
+    return {
+      type: "potential_funding_gap",
+      title: GAP_KIND_TITLES.potential_funding_gap,
+      summary: "Publications outweigh directly matching funded project records in this scan.",
+      reasons,
+    };
+  }
+
+  if (hasStrongEvidence && metrics.reusableOutputs <= metrics.reuseOutputFloor) {
     const reasons = [
-      `${publications} publications were found versus ${reusableOutputs} software/data outputs.`,
-      `Reusable outputs represent about ${Math.round((reusableOutputs / publications) * 100)}% of the publication count in this query.`,
+      `${publications} publications were found versus ${metrics.reusableOutputs} software/data outputs in this scan.`,
+      `Reusable outputs represent about ${Math.round((metrics.reusableOutputs / publications) * 100)}% of the publication count in this scan.`,
     ];
     if (baseline && baseline.publications > 0) {
       const baseRatio =
         (baseline.software + baseline.datasets) / baseline.publications;
-      const topicRatio = reusableOutputs / publications;
+      const topicRatio = metrics.reusableOutputs / publications;
       if (baseRatio > 0 && topicRatio < baseRatio * 0.5) {
         reasons.push(
-          "The translation ratio is less than half the selected baseline topic.",
+          "The software/data output ratio is less than half the selected baseline topic.",
         );
       }
     }
     return {
-      type: "translation_gap",
-      title: GAP_TYPE_LABELS.translation_gap,
-      summary: "Research output is stronger than reusable technical output.",
+      type: "potential_reuse_gap",
+      title: GAP_KIND_TITLES.potential_reuse_gap,
+      summary: `Publications outweigh reusable software and data outputs in this scan. ${REUSE_UNCERTAINTY}`,
       reasons: reasons.slice(0, MAX_REASONS),
     };
   }
 
-  if (
-    publications >= STRONG_EVIDENCE_THRESHOLD &&
-    projects <= Math.max(3, Math.round(publications * PROJECT_RATIO_MIN))
-  ) {
-    return {
-      type: "project_gap",
-      title: GAP_TYPE_LABELS.project_gap,
-      summary: "Research output is stronger than funded project activity.",
-      reasons: [
-        `${publications} publications were found versus ${projects} funded projects.`,
-        `Projects represent about ${Math.round((projects / publications) * 100)}% of the publication count in this query.`,
-      ],
-    };
-  }
-
   return {
-    type: "no_strong_gap",
-    title: GAP_TYPE_LABELS.no_strong_gap,
-    summary: "No strong gap was detected by the MVP heuristic.",
-    reasons: [],
+    type: "no_strong_structural_gap",
+    title: GAP_KIND_TITLES.no_strong_structural_gap,
+    summary: "This scan found no strong structural imbalance in the measured signals.",
+    reasons: [NO_STRONG_CLARIFICATION],
   };
 }
