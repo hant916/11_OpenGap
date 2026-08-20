@@ -226,6 +226,36 @@ describe("RestOpenAireProvider", () => {
     expect(calls.some((call) => call.includes("publicationYear=2026"))).toBe(false);
   });
 
+  it("exchanges a refresh token once and uses the access token for every Graph request", async () => {
+    const { fetchImpl: graphFetch } = makeFetch({
+      yearCounts: { "2025": 1, "2024": 1, "2023": 1, "2022": 1 },
+    });
+    const calls: Array<{ url: string; authorization?: string | null }> = [];
+    const fetchImpl = async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = String(input);
+      if (url.startsWith("https://services.openaire.eu/uoa-user-management")) {
+        expect(new URL(url).searchParams.get("refreshToken")).toBe("refresh-secret");
+        return jsonResponse({ access_token: "short-lived-token" });
+      }
+      calls.push({
+        url,
+        authorization: new Headers(init?.headers).get("Authorization"),
+      });
+      return graphFetch(input);
+    };
+    const provider = createOpenAireProvider({
+      baseUrl: BASE_URL,
+      refreshToken: "refresh-secret",
+      now: () => new Date("2026-08-19T12:00:00.000Z"),
+      fetchImpl: fetchImpl as typeof fetch,
+    });
+
+    await provider.analyzeTopic("AI governance");
+
+    expect(calls).toHaveLength(8);
+    expect(calls.every((call) => call.authorization === "Bearer short-lived-token")).toBe(true);
+  });
+
   it("throws an explicit provider error instead of zeroing metrics", async () => {
     const fetchImpl = vi.fn().mockRejectedValue(new Error("network down"));
     const provider = makeProvider(fetchImpl as unknown as typeof fetch);

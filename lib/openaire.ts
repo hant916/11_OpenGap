@@ -7,13 +7,15 @@ import {
 } from "./domain";
 
 export const DEFAULT_OPENAIRE_BASE_URL = "https://api.openaire.eu";
+export const OPENAIRE_ACCESS_TOKEN_URL =
+  "https://services.openaire.eu/uoa-user-management/api/users/getAccessToken";
 export const DEFAULT_OPENAIRE_TIMEOUT_MS = 15_000;
 export const MAX_TOPIC_LENGTH = 200;
 export const EVIDENCE_PAGE_SIZE = 3;
 
 export type OpenAireConfig = {
   baseUrl?: string;
-  apiToken?: string;
+  refreshToken?: string;
   timeoutMs?: number;
   now?: () => Date;
   fetchImpl?: typeof fetch;
@@ -93,7 +95,8 @@ export function normalizeTopic(topic: string): string {
 
 export class RestOpenAireProvider implements OpenAireProvider {
   private readonly baseUrl: string;
-  private readonly apiToken?: string;
+  private readonly refreshToken?: string;
+  private accessTokenPromise?: Promise<string | undefined>;
   private readonly timeoutMs: number;
   private readonly now: () => Date;
   private readonly fetchImpl: typeof fetch;
@@ -103,8 +106,8 @@ export class RestOpenAireProvider implements OpenAireProvider {
     this.baseUrl = (
       config.baseUrl ?? envBaseUrl ?? DEFAULT_OPENAIRE_BASE_URL
     ).replace(/\/+$/, "");
-    const envToken = process.env.OPENAIRE_API_TOKEN;
-    this.apiToken = config.apiToken ?? (envToken || undefined);
+    const envRefreshToken = process.env.OPENAIRE_REFRESH_TOKEN;
+    this.refreshToken = config.refreshToken ?? (envRefreshToken || undefined);
     const envTimeout = Number(process.env.OPENAIRE_TIMEOUT_MS);
     this.timeoutMs =
       config.timeoutMs ??
@@ -243,12 +246,13 @@ export class RestOpenAireProvider implements OpenAireProvider {
 
     let res: Response;
     try {
+      const accessToken = await this.getAccessToken();
       res = await this.fetchImpl(url, {
         method: "GET",
         headers: {
           Accept: "application/json",
-          ...(this.apiToken
-            ? { Authorization: `Bearer ${this.apiToken}` }
+          ...(accessToken
+            ? { Authorization: `Bearer ${accessToken}` }
             : {}),
         },
         signal: controller.signal,
@@ -285,6 +289,45 @@ export class RestOpenAireProvider implements OpenAireProvider {
         err,
       );
     }
+  }
+
+  private getAccessToken(): Promise<string | undefined> {
+    if (!this.refreshToken) return Promise.resolve(undefined);
+    this.accessTokenPromise ??= this.fetchAccessToken();
+    return this.accessTokenPromise;
+  }
+
+  private async fetchAccessToken(): Promise<string> {
+    const url = new URL(OPENAIRE_ACCESS_TOKEN_URL);
+    url.searchParams.set("refreshToken", this.refreshToken!);
+
+    let res: Response;
+    try {
+      res = await this.fetchImpl(url, {
+        method: "GET",
+        headers: { Accept: "application/json" },
+      });
+    } catch (err) {
+      throw new OpenAireError(
+        "OpenAIRE access-token refresh could not be reached.",
+        "OPENAIRE_UNAVAILABLE",
+        err,
+      );
+    }
+    if (!res.ok) {
+      throw new OpenAireError(
+        `OpenAIRE access-token refresh responded with HTTP ${res.status}.`,
+        "OPENAIRE_UNAVAILABLE",
+      );
+    }
+    const body = (await res.json()) as { access_token?: unknown };
+    if (typeof body.access_token !== "string" || !body.access_token) {
+      throw new OpenAireError(
+        "OpenAIRE access-token refresh returned no access token.",
+        "OPENAIRE_INVALID_RESPONSE",
+      );
+    }
+    return body.access_token;
   }
 
   private toResearchProductEvidence(
